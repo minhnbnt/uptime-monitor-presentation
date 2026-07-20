@@ -1,6 +1,6 @@
 <script>
   import { fly, fade } from 'svelte/transition'
-  import { slides } from './lib/slides.js'
+  import { slides } from './lib/slides/index.js'
   import Diagram from './lib/components/Diagram.svelte'
 
   let current = $state(0)
@@ -187,6 +187,23 @@
             <Diagram diagram={slides[current].diagram} />
           </div>
 
+        {:else if slides[current].type === 'screenshot'}
+          <div class="max-w-5xl mx-auto w-full h-full flex flex-col">
+            <h2 class="font-heading font-bold text-[clamp(1.4rem,2.2vw,2rem)] text-text tracking-tight mb-2 text-center shrink-0">
+              {slides[current].title}
+            </h2>
+            {#if slides[current].caption}
+              <p class="text-text-muted text-sm text-center mb-3 max-w-2xl mx-auto shrink-0">{slides[current].caption}</p>
+            {/if}
+            <div class="diagram-container flex-1 overflow-y-auto min-h-0">
+              <img
+                src={slides[current].src}
+                alt={slides[current].title}
+                class="w-full h-auto rounded-lg"
+              />
+            </div>
+          </div>
+
         {:else if slides[current].type === 'db-schema'}
           <div class="max-w-6xl mx-auto w-full">
             <h2 class="font-heading font-bold text-[clamp(1.4rem,2.2vw,2rem)] text-text tracking-tight mb-2">
@@ -217,10 +234,9 @@
             </h2>
             <div class="diagram-container">
               <img
-                src="/assets/y6SxOX6rAo3CMNsPDg7T8lc2lsQ-VLrGLXK0c_n8k2s=.svg"
-                alt="ERD Diagram"
+                src="/assets/sql-import.svg"
+                alt="SQL Import Diagram"
                 class="w-full h-auto"
-                style="filter: brightness(1.05) contrast(1.1);"
               />
             </div>
           </div>
