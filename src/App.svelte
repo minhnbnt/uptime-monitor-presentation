@@ -234,7 +234,7 @@
             </h2>
             <div class="diagram-container">
               <img
-                src="/assets/sql-import.svg"
+                src="assets/sql-import.svg"
                 alt="SQL Import Diagram"
                 class="w-full h-auto"
               />
