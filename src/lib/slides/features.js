@@ -3,14 +3,7 @@ export const features = [
     id: 'features',
     type: 'section',
     title: 'Các chức năng chính',
-    number: '05',
-  },
-  {
-    id: 'ss-dashboard',
-    type: 'screenshot',
-    title: 'Dashboard — Server List',
-    caption: 'Dashboard hiển thị danh sách server (10.000+), trạng thái online/offline, uptime 30 ngày và sparkline chart',
-    src: 'assets/screenshots/dashboard.png',
+    number: '06',
   },
   {
     id: 'ss-create',

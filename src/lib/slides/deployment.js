@@ -3,7 +3,7 @@ export const deployment = [
     id: 'deployment',
     type: 'section',
     title: 'Deployment',
-    number: '07',
+    number: '08',
   },
   {
     id: 'deployment-detail',
@@ -28,7 +28,7 @@ export const deployment = [
       {
         icon: '🧩',
         title: 'ZSET Sharding',
-        desc: 'fnv32a(endpointID) % N shard, sẵn sàng Redis Cluster; N=1 mặc định (redis.scheduler_shards)',
+        desc: 'fnv32a(endpointID) % N shard, giảm contention; N=1 mặc định (redis.scheduler_shards)',
       },
       {
         icon: '📡',

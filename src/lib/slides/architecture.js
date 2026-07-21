@@ -16,8 +16,8 @@ export const architecture = [
       { icon: 'PG', name: 'PostgreSQL (ParadeDB)', desc: 'pg_search, BM25 full-text, 4 DB/service' },
       { icon: 'PB', name: 'PgBouncer', desc: 'Connection pool (transaction mode)' },
       { icon: 'Re', name: 'Valkey (Redis)', desc: 'Cache + ZSET scheduler + revoke token' },
-      { icon: 'Sh', name: 'ZSET Sharding', desc: 'fnv32a(endpointID) % N shard, sẵn sàng Redis Cluster' },
-      { icon: 'DB', name: 'Debezium', desc: 'CDC: Postgres → Redis Stream → ping-service' },
+      { icon: 'Sh', name: 'ZSET Sharding', desc: 'fnv32a(endpointID) % N shard, giảm contention trên ZSET' },
+      { icon: 'DB', name: 'Debezium', desc: 'CDC: Postgres → 2 Redis Streams → ping-service (endpoints) + ontime-service (servers)' },
       { icon: 'Tr', name: 'Traefik', desc: 'API gateway + forward-auth + CORS' },
       { icon: 'Te', name: 'Temporal', desc: 'Workflow engine (SendReport digest)' },
       { icon: 'JW', name: 'JWT + Argon2', desc: 'Access tokens (15m) + password hashing' },
@@ -65,8 +65,9 @@ export const architecture = [
       PING -->|gRPC :50052| ONT
 
       PG[(Postgres / ParadeDB)]
-      PG -->|CDC log| DEB[Debezium]
-      DEB -->|Redis Stream| PING
+      PG -->|CDC WAL| DEB[Debezium]
+      DEB -->|endpoints stream| PING
+      DEB -->|servers stream| ONT
 
       SRV --> PB[PgBouncer]
       AUTH --> PB
@@ -94,10 +95,11 @@ export const architecture = [
       Service -->|gRPC :50053| PING[ping-service]
       Service -->|register workflow| Temporal[Temporal]
 
-      PG[(Postgres endpoints)] -->|logical WAL| DEB[Debezium]
-      DEB -->|Redis Stream| PING[ping-service]
+      PG[(Postgres)] -->|logical WAL| DEB[Debezium]
+      DEB -->|endpoints stream| PING[ping-service]
+      DEB -->|servers stream| ONT[ontime-service]
       PING -->|ZSET claim| Valkey
-      PING -->|gRPC event| ONT[ontime-service]
+      PING -->|gRPC event| ONT
       PING -->|HTTP ping| Target[(Endpoint)]`,
   },
 ]

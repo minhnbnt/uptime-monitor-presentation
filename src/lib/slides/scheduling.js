@@ -3,7 +3,7 @@ export const scheduling = [
     id: 'scheduling',
     type: 'section',
     title: 'Cơ chế điều độ',
-    number: '04',
+    number: '05',
   },
   {
     id: 'scheduling-detail',
@@ -28,7 +28,7 @@ export const scheduling = [
         'Dùng cho tác vụ ít frequent',
       ],
     },
-    note: 'Thiết kế sẵn sàng chuyển sang cụm Redis (Redis Cluster). Hiện chạy single-node Valkey, N mặc định 1 (config redis.scheduler_shards).',
+    note: 'CDC endpoints stream → ping-service sync scheduler. ZSET sharding giảm contention trên queue.',
   },
   {
     id: 'zset-loop',

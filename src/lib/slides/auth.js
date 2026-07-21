@@ -3,7 +3,7 @@ export const auth = [
     id: 'auth',
     type: 'section',
     title: 'Auth & Bảo mật',
-    number: '06',
+    number: '07',
   },
   {
     id: 'auth-detail',
