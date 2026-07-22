@@ -1,8 +1,7 @@
 import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { sveltekit } from '@sveltejs/kit/vite'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
-  base: '/uptime-monitor-presentation/',
-  plugins: [tailwindcss(), svelte()],
+  plugins: [tailwindcss(), sveltekit()],
 })
