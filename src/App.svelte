@@ -7,12 +7,26 @@
   let current = $state(0)
   let dir = $state(1)
   let touchStartX = $state(0)
+  let syncing = $state(false)
+
+  function syncUrl(i) {
+    const p = new URLSearchParams(location.search)
+    p.set('s', String(i + 1))
+    history.replaceState(null, '', '?' + p.toString())
+  }
 
   function go(i) {
     if (i === current || i < 0 || i >= slides.length) return
     dir = i > current ? 1 : -1
     current = i
+    syncUrl(i)
   }
+
+  $effect(() => {
+    const p = new URLSearchParams(location.search)
+    const n = parseInt(p.get('s'))
+    if (n > 0 && n <= slides.length) current = n - 1
+  })
   function next() { go(current + 1) }
   function prev() { go(current - 1) }
 
