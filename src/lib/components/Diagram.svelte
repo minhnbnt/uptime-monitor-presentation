@@ -1,44 +1,37 @@
 <script>
-  import mermaid from 'mermaid'
+  import Zoomable from './Zoomable.svelte'
 
   let { diagram, dark = true } = $props()
 
-  let container = $state(null)
-  let rendered = $state(false)
-  let inited = $state(false)
+  function initMermaid(m) {
+    m.initialize({
+      startOnLoad: false,
+      theme: dark ? 'dark' : 'default',
+      themeVariables: dark ? {
+        primaryColor: '#1E293B',
+        primaryTextColor: '#F8FAFC',
+        primaryBorderColor: '#334155',
+        lineColor: '#22C55E',
+        secondaryColor: '#0F172A',
+        tertiaryColor: '#1E293B',
+        fontSize: '14px',
+      } : {},
+      flowchart: { useMaxWidth: true },
+      sequence: { useMaxWidth: true },
+    })
+  }
 
-  $effect(() => {
-    if (!inited) {
-      mermaid.initialize({
-        startOnLoad: false,
-        theme: dark ? 'dark' : 'default',
-        themeVariables: dark ? {
-          primaryColor: '#1E293B',
-          primaryTextColor: '#F8FAFC',
-          primaryBorderColor: '#334155',
-          lineColor: '#22C55E',
-          secondaryColor: '#0F172A',
-          tertiaryColor: '#1E293B',
-          fontSize: '14px',
-        } : {},
-        flowchart: { useMaxWidth: true },
-        sequence: { useMaxWidth: true },
-      })
-      inited = true
-    }
-  })
-
-  $effect(() => {
-    if (container && diagram) {
-      rendered = false
-      container.innerHTML = ''
-      const id = 'mermaid-' + Math.random().toString(36).slice(2)
-      mermaid.render(id, diagram).then(({ svg }) => {
-        container.innerHTML = svg
-        rendered = true
-      })
-    }
-  })
+  function renderMermaid(node, { diagram, m }) {
+    const id = 'mermaid-' + Math.random().toString(36).slice(2)
+    m.render(id, diagram).then(({ svg }) => {
+      node.innerHTML = svg
+    })
+  }
 </script>
 
-<div bind:this={container} class="diagram-container {rendered ? '' : 'min-h-[200px]'}"></div>
+<Zoomable>
+  {#await import('mermaid') then { default: m }}
+    {@const _ = initMermaid(m)}
+    <div use:renderMermaid={{ diagram, m }} class="min-h-[200px]"></div>
+  {/await}
+</Zoomable>

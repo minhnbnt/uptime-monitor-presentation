@@ -149,16 +149,20 @@ body {
   border: 1px solid var(--color-border);
   border-radius: 14px;
   padding: 1.25rem;
-  overflow-x: auto;
+  overflow: hidden;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  max-height: calc(80vh - 8rem);
 }
-.diagram-container svg {
-  max-width: 100%;
-  height: auto;
+.diagram-container.grabbing {
+  cursor: grabbing !important;
+}
+.diagram-transform svg {
   display: block;
-  margin: 0 auto;
 }
-
-/* Mermaid override */
 .diagram-container .label {
   color: var(--color-text) !important;
 }

@@ -14,21 +14,22 @@ export const scheduling = [
       title: 'Redis ZSET + LoopWorker',
       items: [
         'Batch task (mặc định 50) mỗi 5s',
-        'Lua atomic: claim → bump score (lock) → return',
-        'Sharding: fnv32a(endpointID) % N shard, mỗi shard 1 goroutine + 1 Lua claim',
-        'Cache-through: Valkey hash (TTL 1h) → fallback DB',
-        '10.000 endpoint / 30s, CPU không spike',
+        'Lua atomic: claim → bump score → return, tránh chen giữa',
+        'Offset = FNV-1a(endpointID) % interval, dàn đều theo thời gian',
+        'AOF always: không mất task sau downtime',
+        'Sharding: fnv32a(id) % N, mỗi shard 1 goroutine, dàn đều tải',
       ],
     },
     temporal: {
       title: 'Temporal Workflow',
       items: [
         'SendReportWorkflow: digest email định kỳ',
-        'Retry cơ bản, độ tin cậy cao',
-        'Dùng cho tác vụ ít frequent',
+        'Mail ít frequent → log Temporal không thành vấn đề',
+        'Retry khi lỗi, phù hợp task không được miss',
+        'Không dùng Temporal cho ping: 10.000 endpoint × lưu log 1 ngày → insert chậm, lag schedule',
       ],
     },
-    note: 'CDC endpoints stream → ping-service sync scheduler. ZSET sharding giảm contention trên queue.',
+    note: 'Debezium bắt INSERT/UPDATE/DELETE endpoints → consumer ZADD vào ZSET. Sharding giảm contention, phân tải đều.',
   },
   {
     id: 'zset-loop',
@@ -71,5 +72,48 @@ export const scheduling = [
       end
 
       Note over WN: tương tự shard N-1 (N mặc định 1)`,
+  },
+  {
+    id: 'event-dedup',
+    type: 'two-column',
+    title: 'Event Dedup — 2 lớp',
+    left: {
+      title: 'ping-service (trước gRPC)',
+      items: [
+        'Đọc status cache trong Redis',
+        'Nếu status == lastStatus → skip gRPC',
+        'Nếu key không tồn tại hoặc status khác → gRPC đến ontime-service',
+      ],
+    },
+    right: {
+      title: 'ontime-service (trước INSERT)',
+      items: [
+        'Trong 1 DB transaction: query latest event theo endpoint_id',
+        'Nếu status trùng → return nil, không INSERT',
+        'Nếu status khác hoặc chưa có event → INSERT',
+      ],
+    },
+    note: 'ON → ON → ON: lần 1 ghi DB, các lần sau bị chặn bởi cả 2 lớp. Chỉ 1 row trong server_events.',
+  },
+  {
+    id: 'ontime-calc',
+    type: 'two-column',
+    title: 'Tính ontime hàng ngày',
+    left: {
+      title: 'Tìm biên',
+      items: [
+        'Điểm đầu = max(start, first_event_time)',
+        'Điểm cuối = min(end, now)',
+        'Lấy event trước điểm đầu và điểm cuối để xác định trạng thái',
+      ],
+    },
+    right: {
+      title: 'Tính tỉ lệ',
+      items: [
+        'Duyệt event, tìm các khoảng ON → OFF',
+        'Tổng thời gian ON / tổng thời gian',
+        'Dùng cache Valkey (TTL 10s hôm nay / 1h lịch sử)',
+      ],
+    },
   },
 ]

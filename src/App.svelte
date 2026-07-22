@@ -2,6 +2,7 @@
   import { fly, fade } from 'svelte/transition'
   import { slides } from './lib/slides/index.js'
   import Diagram from './lib/components/Diagram.svelte'
+  import Zoomable from './lib/components/Zoomable.svelte'
 
   let current = $state(0)
   let dir = $state(1)
@@ -195,12 +196,15 @@
             {#if slides[current].caption}
               <p class="text-text-muted text-sm text-center mb-3 max-w-2xl mx-auto shrink-0">{slides[current].caption}</p>
             {/if}
-            <div class="diagram-container flex-1 overflow-y-auto min-h-0">
-              <img
-                src={slides[current].src}
-                alt={slides[current].title}
-                class="w-full h-auto rounded-lg"
-              />
+            <div class="flex-1 min-h-0">
+              <Zoomable>
+                <img
+                  src={slides[current].src}
+                  alt={slides[current].title}
+                  class="rounded-lg"
+                  draggable="false"
+                />
+              </Zoomable>
             </div>
           </div>
 
@@ -232,13 +236,13 @@
             <h2 class="font-heading font-bold text-[clamp(1.4rem,2.2vw,2rem)] text-text tracking-tight mb-4 text-center">
               {slides[current].title}
             </h2>
-            <div class="diagram-container">
+            <Zoomable>
               <img
                 src="assets/sql-import.svg"
                 alt="SQL Import Diagram"
-                class="w-full h-auto"
+                draggable="false"
               />
-            </div>
+            </Zoomable>
           </div>
 
         {:else if slides[current].type === 'scheduling'}
