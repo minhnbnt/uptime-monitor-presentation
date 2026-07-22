@@ -46,6 +46,7 @@
 
 <div
   bind:this={container}
+  role="application"
   class="diagram-container {dragging ? 'grabbing' : ''}"
   style="cursor: grab"
   onwheel={onWheel}
