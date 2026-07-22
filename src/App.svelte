@@ -251,11 +251,12 @@
               {slides[current].title}
             </h2>
             <Zoomable>
-              <img
-                src="assets/sql-import.svg"
-                alt="SQL Import Diagram"
+              <object
+                data="assets/sql-import.svg"
+                type="image/svg+xml"
+                class="w-full h-full"
                 draggable="false"
-              />
+              ></object>
             </Zoomable>
           </div>
 
