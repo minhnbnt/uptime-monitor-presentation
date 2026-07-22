@@ -256,6 +256,7 @@
                 type="image/svg+xml"
                 class="w-full h-full"
                 draggable="false"
+                aria-label="SQL Import Diagram"
               ></object>
             </Zoomable>
           </div>
