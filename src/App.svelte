@@ -257,6 +257,7 @@
                 class="w-full h-full"
                 draggable="false"
                 aria-label="SQL Import Diagram"
+                style="pointer-events: none"
               ></object>
             </Zoomable>
           </div>
