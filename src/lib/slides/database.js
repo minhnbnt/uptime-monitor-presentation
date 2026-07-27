@@ -47,5 +47,6 @@ export const database = [
     id: 'erd',
     type: 'erd',
     title: 'ERD — Entity Relationship Diagram',
+    src: 'assets/sql-import.svg',
   },
 ]

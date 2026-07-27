@@ -38,46 +38,9 @@ export const architecture = [
   },
   {
     id: 'topology',
-    type: 'diagram',
+    type: 'erd',
     title: 'Topology — 6 Microservices',
-    diagram: `flowchart TB
-      Client[Client] -->|HTTPS| TR[Traefik :8080\\nAPI Gateway]
-
-      subgraph Edge[Edge Routers]
-        TR --> AUTH[auth-service :8081\\n/api/v1/auth]
-        TR --> SRV[server-service :8080\\n/api/v1/servers]
-        TR --> IMP[importer-service :8086\\n/import /export]
-        TR --> ONT[ontime-service :8084\\n/api/v1/servers/ontime]
-        TR --> NOT[notification-service :8085\\n/api/v1/notifications]
-      end
-
-      TR -. forward-auth verify .-> AUTH
-      AUTH -->|set X-User-ID| TR
-
-      subgraph Workers[Internal Workers]
-        PING[ping-service :50053 gRPC\\n+ ZSET scheduler]
-      end
-
-      PING -->|gRPC GetEndpoints :50051| SRV
-      SRV -->|gRPC Ping :50053| PING
-      PING -->|gRPC RecordEvent :50052| ONT
-      IMP -->|gRPC BatchCreateServers :50051| SRV
-      NOT -->|gRPC :50051| SRV
-      NOT -->|gRPC GetServersOntime :50052| ONT
-
-      SRV --> PB[PgBouncer]
-      AUTH --> PB
-      ONT --> PB
-      NOT --> PB
-      PB --> PG[(Postgres + pg_search)]
-
-      PG -->|logical WAL| DEB[Debezium]
-      DEB -->|Redis Stream\\nuptime.public.endpoints| PING
-      DEB -->|Redis Stream\\nuptime.public.servers| ONT
-
-      PING --> V[Valkey / Redis]
-      NOT --> T[Temporal]
-      NOT --> M[Mailpit SMTP]`,
+    src: 'diagram.svg',
   },
   {
     id: 'data-flow',

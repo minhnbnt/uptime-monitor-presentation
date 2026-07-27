@@ -252,11 +252,11 @@
             </h2>
             <Zoomable>
               <object
-                data="assets/sql-import.svg"
+                data={slides[current].src}
                 type="image/svg+xml"
                 class="w-full h-full"
                 draggable="false"
-                aria-label="SQL Import Diagram"
+                aria-label={slides[current].title}
                 style="pointer-events: none"
               ></object>
             </Zoomable>
