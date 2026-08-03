@@ -1,28 +1,23 @@
 export const cdc = [
   {
-    id: 'cdc',
-    type: 'section',
-    title: 'Đồng bộ ownership',
-    number: '04',
-  },
-  {
     id: 'cdc-idea',
     type: 'two-column',
-    title: 'Ý tưởng',
+    title: 'Đồng bộ quan hệ User–Server giữa các service',
     left: {
-      title: 'Hiện trạng',
+      title: 'Vấn đề',
       items: [
-        'CountByStatus cần biết phạm vi server của từng user',
-        'ontime-service chưa có ownership local để tự tính count',
-        'Phụ thuộc đồng bộ vào server-service làm flow nặng hơn',
+        'ontime-service chỉ ghi nhận event, không biết server thuộc user nào',
+        'Khi đếm số server theo từng status, phải gửi rất nhiều id đến để đếm',
+        'Gọi đồng bộ gRPC server-service mỗi lần → payload lớn, độ trễ tăng tuyến tính',
       ],
     },
     right: {
-      title: 'Hướng xử lý',
+      title: 'Giải pháp',
       items: [
-        'Replicate ownership server -> server_owners bằng Debezium CDC',
-        'CountByStatus chỉ cần user_id',
-        'ontime-service JOIN local server_owners + server_events để trả count',
+        'Debezium CDC từ Postgres WAL của server-service → Redis Stream (uptime.public.servers)',
+        'ontime-service chạy OwnershipConsumer duy trì table server_owners nội bộ',
+        'CountByStatus dùng SQL JOIN cục bộ, không phụ thuộc server-service tại runtime',
+        'Eventually consistent — loại bỏ synchronous call ở đường đọc aggregate/count',
       ],
     },
   },

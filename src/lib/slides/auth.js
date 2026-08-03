@@ -1,64 +1,62 @@
 export const auth = [
   {
-    id: 'auth',
+    id: 'design-decisions',
     type: 'section',
-    title: 'Auth & Bảo mật',
-    number: '07',
+    title: 'Quyết định thiết kế',
+    number: '04',
   },
   {
-    id: 'auth-detail',
-    type: 'card-grid',
-    title: 'Auth & Bảo mật',
-    cards: [
-      { title: 'JWT', desc: 'Access token, auth-service cấp & xác thực', icon: '🔐' },
-      { title: 'Argon2', desc: 'Password hashing chuẩn OWASP', icon: '🔑' },
-      { title: 'Revoke Token', desc: 'Blacklist trong Valkey khi logout', icon: '🚫' },
-      { title: 'Forward-auth', desc: 'Traefik gọi auth-service verify, set X-User-ID', icon: '🌐' },
-      { title: 'Viper Config', desc: 'CLI > env > config.yaml > default', icon: '⚙️' },
-      { title: 'Zap + Lumberjack', desc: 'Structured logging + log rotation', icon: '📝' },
-    ],
+    id: 'auth-oidc',
+    type: 'two-column',
+    title: 'Xác thực tập trung qua GoTrue + OIDC',
+    left: {
+      title: 'Vấn đề',
+      items: [
+        'auth-service tự viết thì phải tự code & maintain toàn bộ auth (signup, login, JWT, hash)',
+        'Phân phối secret key ký JWT tới từng service → khó quản lý, dễ lộ',
+        'Rotate khóa khi cần phải đồng bộ thủ công giữa mọi service',
+      ],
+    },
+    right: {
+      title: 'Giải pháp',
+      items: [
+        'GoTrue chuẩn OIDC có sẵn → không cần code nhiều, không phải tự maintain auth',
+        'OIDC discovery giúp phân phối key dễ dàng — service lấy public key từ JWKS',
+        'Dễ dàng rotate khi cần — chỉ thay đổi một nơi, các service tự nhận key mới',
+      ],
+    },
   },
   {
     id: 'auth-flow',
     type: 'diagram',
-    title: 'Auth Flow — Forward-auth & Token',
+    title: 'Auth Flow — GoTrue & OIDC verify',
     diagram: `sequenceDiagram
       actor User as Người dùng
-      participant TR as Traefik
-      participant AUTH as auth-service
-      participant DB as Database
-      participant Redis as Valkey
+      participant GT as GoTrue
+      participant SRV as Service (HTTP)
+      participant JWKS as JWKS / OIDC Discovery
 
-      User->>TR: Request có Bearer token
-      TR->>AUTH: forward-auth /auth/verify
-      AUTH->>AUTH: Validate JWT
-      AUTH-->>TR: 200 + header X-User-ID
-      TR->>TR: inject X-User-ID downstream
-      TR-->>User: 200 OK (service xử lý)
+      User->>GT: POST /signup (email, password)
+      GT->>GT: Tạo user, generate pair (JWT ES256)
+      GT-->>User: access_token + refresh_token
 
-      User->>AUTH: POST /auth/register
-      AUTH->>DB: Tạo user (Argon2 hash)
-      AUTH-->>User: access_token(15m) + refresh_token(7d)
-
-      User->>AUTH: POST /auth/login
-      AUTH->>DB: Verify credentials
+      User->>GT: POST /token (email + password)
       alt Sai
-        AUTH-->>User: 401 Unauthorized
+        GT-->>User: 401 Unauthorized
       else Đúng
-        AUTH-->>User: access_token + refresh_token
+        GT-->>User: access_token + refresh_token
       end
 
-      User->>AUTH: POST /auth/refresh
-      AUTH->>Redis: Check revoked?
-      alt Đã thu hồi
-        AUTH-->>User: 401 Unauthorized
-      else Còn hạn
-        AUTH->>Redis: Revoke refresh token cũ
-        AUTH-->>User: Token pair mới
-      end
+      User->>GT: POST /token?grant_type=refresh
+      GT-->>User: access_token mới
 
-      User->>AUTH: POST /auth/logout
-      AUTH->>Redis: SET revoked_token (TTL = token expiry)
-      AUTH-->>User: 200 OK`,
+      User->>SRV-Service: Request + Bearer access_token
+      SRV-Service->>JWKS: OIDC discovery (issuer/x509)
+      JWKS-->>SRV-Service: public key
+      SRV-Service->>SRV-Service: Verify JWT (iss, aud, exp), user_id = UUID sub
+      SRV-Service-->>User: 200 OK (user_id UUID từ token)
+
+      User->>GT: POST /logout
+      GT-->>User: 200 OK`,
   },
 ]

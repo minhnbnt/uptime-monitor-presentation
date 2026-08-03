@@ -2,28 +2,51 @@ export const features = [
   {
     id: 'features',
     type: 'section',
-    title: 'Các chức năng chính',
-    number: '06',
+    title: 'Tính năng',
+    number: '03',
+  },
+  {
+    id: 'features-overview',
+    type: 'two-column',
+    title: 'Chức năng chính',
+    left: {
+      title: 'CRUD Server',
+      items: [
+        'Tạo, xem, sửa, xóa server bằng k8s identity (namespace, kind, object_id, container_name)',
+        'Kiểm tra quyền sở hữu (created_by_id UUID == user id) ở mọi thao tác',
+        'Test-server: truy vấn pod/container status qua k8s API trước khi lưu',
+        'Import hàng loạt từ CSV/Excel, kết quả theo từng dòng (row-level)',
+      ],
+    },
+    right: {
+      title: 'Báo cáo định kỳ & chủ động',
+      items: [
+        'Định kỳ: cấu hình lịch → Temporal trigger workflow → tổng hợp số liệu → gửi mail',
+        'Chủ động (on-demand): SendReport → Temporal trigger ngay lập tức',
+        'Cả hai dùng chung workflow gRPC auth/server/ontime lấy thông tin + số liệu',
+        'Export server ra file phục vụ sao lưu / di chuyển cấu hình',
+      ],
+    },
   },
   {
     id: 'ss-create',
     type: 'screenshot',
-    title: 'Tạo Server & Cấu hình Endpoint',
-    caption: 'Form tạo server + Check Method: URL, method, interval, timeout, expected code',
+    title: 'Tạo Server & Cấu hình Check',
+    caption: 'Form tạo server: k8s identity (namespace, kind, object), interval, timeout, container',
     src: 'assets/screenshots/create-server.png',
   },
   {
     id: 'ss-check-method',
     type: 'screenshot',
-    title: 'Check Method Setup',
-    caption: 'Cấu hình Pull method với endpoint URL, HTTP method, interval, timeout, expected status code',
+    title: 'Check Định nghĩa',
+    caption: 'Cấu hình check k8s object: namespace, kind, object_id, container_name, interval, timeout',
     src: 'assets/screenshots/check-method.png',
   },
   {
     id: 'ss-detail',
     type: 'screenshot',
     title: 'Server Detail & Uptime',
-    caption: 'Chi tiết server: endpoint config, trạng thái, uptime chart 30 ngày',
+    caption: 'Chi tiết server: k8s identity, trạng thái pod, uptime chart 30 ngày',
     src: 'assets/screenshots/server-detail.png',
   },
   {
@@ -48,26 +71,26 @@ export const features = [
     src: 'assets/screenshots/notifications.png',
   },
   {
-    id: 'create-endpoint',
+    id: 'create-server',
     type: 'diagram',
-    title: 'Tạo Endpoint — API Flow',
+    title: 'Tạo Server — API Flow',
     diagram: `sequenceDiagram
       actor User as Người dùng
-      participant TR as Traefik
+      participant TR as Cilium Gateway
       participant API as server-service
       participant DB as Postgres
       participant DEB as Debezium
       participant Redis as Valkey Stream
       participant PING as ping-service
 
-      User->>TR: POST /api/v1/servers
-      TR->>API: forward (X-User-ID)
-      API->>DB: Lưu server + endpoint
+      User->>TR: POST /api/v1/servers (k8s identity)
+      TR->>API: reverse proxy
+      API->>DB: Lưu server (namespace, kind, object_id)
       API-->>User: Thành công
-      DB->>DEB: WAL change (endpoints)
+      DB->>DEB: WAL change (servers)
       DEB->>Redis: Stream event
       Redis-->>PING: consume
-      Note over PING: offset = hash(key) % interval
+      Note over PING: offset = hash(serverID) % interval
       PING->>Redis: ZADD scheduler:queue:<shard>`,
   },
   {
@@ -109,7 +132,7 @@ export const features = [
       participant SRV as server-service
       participant ONT as ontime-service
       participant Redis as Valkey
-      participant Mail as Mailpit
+      participant Mail as SMTP
 
       Temporal->>Worker: Trigger SendReportWorkflow
       Worker->>SRV: gRPC Load servers + dates
@@ -132,8 +155,8 @@ export const features = [
     left: {
       title: 'CRUD Server (server-service)',
       items: [
-        'Mỗi server có 1 endpoint',
-        'Dữ liệu phân tách theo user (created_by_id)',
+        'Mỗi server định danh bằng k8s object (namespace, kind, object_id)',
+        'Dữ liệu phân tách theo user (created_by_id UUID)',
         'Cleanup scheduler + cache khi xoá',
         'Handler → Service → Repository → DB',
       ],

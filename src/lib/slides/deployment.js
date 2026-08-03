@@ -2,8 +2,8 @@ export const deployment = [
   {
     id: 'deployment',
     type: 'section',
-    title: 'Deployment',
-    number: '08',
+    title: 'Triển khai',
+    number: '05',
   },
   {
     id: 'deployment-detail',
@@ -13,32 +13,42 @@ export const deployment = [
       {
         icon: '🐳',
         title: 'Docker Multi-stage',
-        desc: 'golang:1.26-alpine → buf gen → UPX compress → distroless nonroot',
+        desc: 'golang:1.26-alpine → UPX compress → distroless nonroot',
       },
       {
-        icon: '🧩',
-        title: 'Docker Compose (13 services)',
-        desc: '6 microservices + Traefik (gateway) + 7 infra: ParadeDB, PgBouncer, Valkey, Debezium, Temporal, pgAdmin, Mailpit',
+        icon: '☸️',
+        title: 'Talos Linux',
+        desc: 'OS tối giản, bất biến, chuyên cho Kubernetes — không SSH, không shell, quản lý qua talosctl (API), upgrade atomic',
       },
       {
-        icon: '🔀',
-        title: 'Traefik Gateway',
-        desc: 'Routing theo PathPrefix, forward-auth + CORS middleware qua labels',
+        icon: '☸️',
+        title: 'Kubernetes + Helm',
+        desc: 'K8s chạy trên nền Talos; triển khai service qua helm chart; GoTrue chạy như 1 service',
+      },
+      {
+        icon: '🌐',
+        title: 'Cilium',
+        desc: 'Reverse proxy (Envoy, Gateway API) route theo HTTPRoute + CORS; Network Policy giới hạn traffic giữa service',
+      },
+      {
+        icon: '🔐',
+        title: 'GoTrue',
+        desc: 'Service auth: JWT ES256, OIDC discovery, mỗi service verify cục bộ',
+      },
+      {
+        icon: '☸️',
+        title: 'K8s Client (client-go)',
+        desc: 'ping-service truy vấn pod/container status; RBAC ServiceAccount (pods/get, deployments/get, statefulsets/get...)',
       },
       {
         icon: '🧩',
         title: 'ZSET Sharding',
-        desc: 'fnv32a(endpointID) % N shard, giảm contention; N=1 mặc định (redis.scheduler_shards)',
+        desc: 'Băm serverID chia dư cho N shard, giảm contention; N=1 mặc định (redis.scheduler_shards)',
       },
       {
         icon: '📡',
         title: 'gRPC nội bộ',
         desc: 'common/proto (buf) làm contract; service giao tiếp qua gRPC',
-      },
-      {
-        icon: '🔀',
-        title: 'Air (hot-reload)',
-        desc: 'make dev — tự động rebuild khi code thay đổi',
       },
       {
         icon: '🧪',
