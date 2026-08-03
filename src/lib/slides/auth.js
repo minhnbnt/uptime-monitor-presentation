@@ -13,8 +13,7 @@ export const auth = [
       title: 'Vấn đề',
       items: [
         'auth-service tự viết thì phải tự code & maintain toàn bộ auth (signup, login, JWT, hash)',
-        'Phân phối secret key ký JWT tới từng service → khó quản lý, dễ lộ',
-        'Rotate khóa khi cần phải đồng bộ thủ công giữa mọi service',
+        'Rotate khóa phải deploy lại toàn bộ service',
       ],
     },
     right: {
