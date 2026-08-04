@@ -13,7 +13,6 @@ export const features = [
       title: 'CRUD Server',
       items: [
         'Tạo, xem, sửa, xóa server bằng k8s identity (namespace, kind, object_id, container_name)',
-        'Kiểm tra quyền sở hữu (created_by_id UUID == user id) ở mọi thao tác',
         'Test-server: truy vấn pod/container status qua k8s API trước khi lưu',
         'Import hàng loạt từ CSV/Excel, kết quả theo từng dòng (row-level)',
       ],

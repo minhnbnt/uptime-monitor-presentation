@@ -72,6 +72,12 @@ export const scheduling = [
     },
   },
   {
+    id: 'ontime-lowerbound',
+    type: 'erd',
+    title: 'Lowerbound — event trước cửa sổ',
+    src: 'assets/uptime_lowerbound_timeline.svg',
+  },
+  {
     id: 'scheduling-debezium',
     type: 'two-column',
     title: 'Vấn đề 1 — Đồng bộ cấu hình server qua Debezium',
