@@ -13,12 +13,9 @@ export const intro = [
     items: [
       'Yêu cầu hệ thống',
       'Tech Stack & Kiến trúc microservices',
-      'Topology dịch vụ',
       'Cơ sở dữ liệu',
-      'CDC ownership replication',
-      'Cơ chế điều độ (ZSET + Temporal)',
       'Các chức năng chính',
-      'Xác thực GoTrue + OIDC',
+      'Quyết định thiết kế',
       'Deployment',
     ],
   },
