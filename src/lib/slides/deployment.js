@@ -28,7 +28,7 @@ export const deployment = [
       {
         icon: '🌐',
         title: 'Cilium',
-        desc: 'Reverse proxy (Envoy, Gateway API) route theo HTTPRoute + CORS; Network Policy giới hạn traffic giữa service',
+        desc: 'Reverse proxy (Envoy, Gateway API) chỉ route HTTP theo HTTPRoute; Network Policy giới hạn traffic giữa service',
       },
       {
         icon: '🔐',
@@ -39,26 +39,6 @@ export const deployment = [
         icon: '☸️',
         title: 'K8s Client (client-go)',
         desc: 'ping-service truy vấn pod/container status; RBAC ServiceAccount (pods/get, deployments/get, statefulsets/get...)',
-      },
-      {
-        icon: '🧩',
-        title: 'ZSET Sharding',
-        desc: 'Băm serverID chia dư cho N shard, giảm contention; N=1 mặc định (redis.scheduler_shards)',
-      },
-      {
-        icon: '📡',
-        title: 'gRPC nội bộ',
-        desc: 'common/proto (buf) làm contract; service giao tiếp qua gRPC',
-      },
-      {
-        icon: '🧪',
-        title: 'Testing',
-        desc: 'testify + testcontainers-go (real Postgres/Valkey/Temporal)',
-      },
-      {
-        icon: '📏',
-        title: 'Linting',
-        desc: 'golangci-lint (gofmt, govet, errcheck, staticcheck, revive...)',
       },
     ],
   },
