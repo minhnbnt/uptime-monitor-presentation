@@ -250,6 +250,9 @@
             <h2 class="font-heading font-bold text-[clamp(1.4rem,2.2vw,2rem)] text-text tracking-tight mb-4 text-center">
               {slides[current].title}
             </h2>
+            {#if slides[current].caption}
+              <p class="text-text-muted text-sm text-center mb-3 max-w-2xl mx-auto">{slides[current].caption}</p>
+            {/if}
             <Zoomable>
               <object
                 data={slides[current].src}

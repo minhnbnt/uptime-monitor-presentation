@@ -75,6 +75,7 @@ export const scheduling = [
     id: 'ontime-lowerbound',
     type: 'erd',
     title: 'Lowerbound — event trước cửa sổ',
+    caption: 'Hình minh họa cách tính uptime với lowerbound',
     src: 'assets/uptime_lowerbound_timeline.svg',
   },
   {
@@ -84,7 +85,7 @@ export const scheduling = [
     left: {
       title: 'Vấn đề',
       items: [
-        'Cần biết ngay khi server (k8s object) mới được tạo/sửa/xóa để cập nhật task check',
+        'Cần biết ngay khi server (k8s object) mới được tạo/sửa/xóa để thêm/xóa task, invalidate cache khi có thay đổi',
         'Polling DB liên tục tốn tài nguyên, độ trễ cao',
       ],
     },
@@ -92,7 +93,7 @@ export const scheduling = [
       title: 'Giải pháp',
       items: [
         'Debezium CDC bắt sự kiện từ server-service WAL → Redis Stream',
-        'ping-service consume real-time, cập nhật scheduler ngay khi có thay đổi',
+        'ping-service consume real-time, thêm/xóa task & invalidate cache ngay khi có thay đổi',
       ],
     },
   },

@@ -50,7 +50,7 @@ export const auth = [
       GT-->>User: access_token mới
 
       User->>SRV-Service: Request + Bearer access_token
-      SRV-Service->>JWKS: OIDC discovery (issuer/x509)
+      SRV-Service->>JWKS: OIDC discovery (issuer/JWKS)
       JWKS-->>SRV-Service: public key
       SRV-Service->>SRV-Service: Verify JWT (iss, aud, exp), user_id = UUID sub
       SRV-Service-->>User: 200 OK (user_id UUID từ token)

@@ -18,7 +18,7 @@ export const deployment = [
       {
         icon: '☸️',
         title: 'Talos Linux',
-        desc: 'OS tối giản, bất biến, chuyên cho Kubernetes — không SSH, không shell, quản lý qua talosctl (API), upgrade atomic',
+        desc: 'OS tối giản, bất biến, chuyên cho Kubernetes — không SSH, không shell, bootstrap bằng OpenTofu, upgrade atomic',
       },
       {
         icon: '☸️',
