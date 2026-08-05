@@ -2,8 +2,8 @@ export const intro = [
   {
     id: 'title',
     type: 'title',
-    title: 'UptimeMonitor',
-    subtitle: 'Hệ thống giám sát uptime tự động',
+    title: 'Server Management System',
+    subtitle: 'Hệ thống quản lý server',
     meta: 'System Design — Go • gRPC • PostgreSQL • Kubernetes • GoTrue/OIDC • Redis • Temporal • Debezium • Cilium',
   },
   {

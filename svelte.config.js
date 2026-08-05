@@ -12,7 +12,7 @@ export default {
       strict: true,
     }),
     paths: {
-      base: '/uptime-monitor-presentation',
+      base: '/server-management-system-presentation',
     },
   },
 }

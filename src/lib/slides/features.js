@@ -30,16 +30,9 @@ export const features = [
   {
     id: 'ss-create',
     type: 'screenshot',
-    title: 'Tạo Server & Cấu hình Check',
-    caption: 'Form tạo server: k8s identity (namespace, kind, object), interval, timeout, container',
-    src: 'assets/screenshots/create-server.png',
-  },
-  {
-    id: 'ss-check-method',
-    type: 'screenshot',
-    title: 'Check Định nghĩa',
-    caption: 'Cấu hình check k8s object: namespace, kind, object_id, container_name, interval, timeout',
-    src: 'assets/screenshots/check-method.png',
+    title: 'Tạo Pod & Cấu hình Check',
+    caption: 'Form tạo pod: k8s identity (namespace, kind, object), interval, timeout, container',
+    src: 'assets/screenshots/create-pod.png',
   },
   {
     id: 'ss-detail',

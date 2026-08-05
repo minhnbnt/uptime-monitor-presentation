@@ -32,10 +32,4 @@ export const database = [
     ],
     note: 'Database riêng (server / analytics / notification) + GoTrue (user/auth data). Bảng endpoints đã được merge vào servers (k8s identity). Chỉ server DB bật wal_level=logical cho CDC. Xem slide CDC ownership replication →',
   },
-  {
-    id: 'erd',
-    type: 'erd',
-    title: 'ERD — Entity Relationship Diagram',
-    src: 'assets/sql-import.svg',
-  },
 ]
