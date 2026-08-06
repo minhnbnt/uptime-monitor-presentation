@@ -13,7 +13,7 @@ export const features = [
       title: 'CRUD Server',
       items: [
         'Tạo, xem, sửa, xóa server bằng k8s identity (namespace, kind, object_id, container_name)',
-        'Test-server: truy vấn pod/container status qua k8s API trước khi lưu',
+        'Test-server: truy vấn server/container status qua k8s API trước khi lưu',
         'Import hàng loạt từ CSV/Excel, kết quả theo từng dòng (row-level)',
       ],
     },
@@ -30,14 +30,14 @@ export const features = [
   {
     id: 'ss-create',
     type: 'screenshot',
-    title: 'Tạo Pod & Cấu hình Check',
-    caption: 'Form tạo pod: k8s identity (namespace, kind, object), interval, timeout, container',
+    title: 'Tạo Server & Cấu hình Check',
+    caption: 'Form tạo server: k8s identity (namespace, kind, object), interval, timeout, container',
     src: 'assets/screenshots/create-pod.png',
   },
   {
     id: 'flow-create',
     type: 'diagram',
-    title: 'Tạo Pod & Cấu hình Check — Sequence',
+    title: 'Tạo Server & Cấu hình Check — Sequence',
     diagram: `sequenceDiagram
       autonumber
       actor User
@@ -53,10 +53,10 @@ export const features = [
       User->>GW: POST /api/v1/k8s-objects (JWT)
       GW->>SRV: reverse proxy
       SRV->>SRV: verify JWT (GoTrue OIDC)
-      SRV->>K8S: EnsureNamespace + CreatePod
-      K8S-->>SRV: pod created
+      SRV->>K8S: EnsureNamespace + CreateServer
+      K8S-->>SRV: server created
       SRV->>DB: INSERT servers + server_http_configs (txn)
-      SRV-->>User: ServerObject (pod + check config)
+      SRV-->>User: ServerObject (server + check config)
       DB->>DEB: logical WAL
       DEB->>Redis: uptime.public.servers
       Redis-->>PING: ServerEventHandler
@@ -68,7 +68,7 @@ export const features = [
     id: 'ss-detail',
     type: 'screenshot',
     title: 'Server Detail & Uptime',
-    caption: 'Chi tiết server: k8s identity, trạng thái pod, uptime chart 30 ngày',
+    caption: 'Chi tiết server: k8s identity, trạng thái server, uptime chart 30 ngày',
     src: 'assets/screenshots/server-detail.png',
   },
   {

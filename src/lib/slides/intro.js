@@ -33,7 +33,7 @@ export const intro = [
       'Đăng ký / Đăng nhập tài khoản bằng email (GoTrue)',
       'Quản lý server (CRUD)',
       'Giám sát server theo k8s identity (namespace, kind, object_id)',
-      'Kiểm tra trạng thái pod/container tự động theo lịch (interval cấu hình được)',
+      'Kiểm tra trạng thái server/container tự động theo lịch (interval cấu hình được)',
       'Xem tỉ lệ uptime theo ngày/khoảng thời gian',
       'Tìm kiếm server full-text',
       'Xuất / Nhập danh sách server từ Excel',

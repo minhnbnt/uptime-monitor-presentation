@@ -176,7 +176,7 @@ export const scheduling = [
         W1->>Lua: Load task info
         Lua-->>W1: server, namespace, kind, object_id
         Note over W1: offset = FNV-1a(id) % interval
-        W1->>K8S: client-go get pod/container status
+        W1->>K8S: client-go get server/container status
         K8S-->>W1: running (bool) / readiness
         W1->>Lua: Reschedule: key = now + interval
         W1->>Stream: Update status cache

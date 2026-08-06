@@ -38,7 +38,7 @@ export const deployment = [
       {
         icon: '☸️',
         title: 'K8s Client (client-go)',
-        desc: 'ping-service truy vấn pod/container status; RBAC ServiceAccount (pods/get, deployments/get, statefulsets/get...)',
+        desc: 'ping-service truy vấn server/container status; RBAC ServiceAccount (servers/get, deployments/get, statefulsets/get...)',
       },
     ],
   },
