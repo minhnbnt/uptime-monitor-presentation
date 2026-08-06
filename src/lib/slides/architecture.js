@@ -46,6 +46,12 @@ export const architecture = [
     ],
   },
   {
+    id: 'architecture-total',
+    type: 'erd',
+    title: 'Kiến trúc tổng quan',
+    src: 'assets/uptime_monitor_architecture_simple.svg',
+  },
+  {
     id: 'data-flow',
     type: 'diagram',
     title: 'Luồng dữ liệu tổng quan',
@@ -85,11 +91,5 @@ export const architecture = [
 
       NOT -->|schedule SendReportWorkflow| Temporal[Temporal]
       NOT -->|email digest| Mail[(SMTP)]`,
-  },
-  {
-    id: 'architecture-total',
-    type: 'erd',
-    title: 'Kiến trúc tổng quan',
-    src: 'assets/uptime_monitor_architecture_simple.svg',
   },
 ]
