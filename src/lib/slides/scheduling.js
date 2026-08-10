@@ -156,7 +156,6 @@ export const scheduling = [
       participant W1 as Worker shard 0
       participant WN as Worker shard N-1
       participant Lua as Lua (per shard)
-      participant K8S as Kubernetes API
 
       DEB->>Stream: servers change event
       Stream-->>Router: consume (consumer group)
@@ -175,14 +174,76 @@ export const scheduling = [
       loop Each due task (per shard)
         W1->>Lua: Load task info
         Lua-->>W1: server, namespace, kind, object_id
-        Note over W1: offset = FNV-1a(id) % interval
-        W1->>K8S: client-go get server/container status
-        K8S-->>W1: running (bool) / readiness
-        W1->>Lua: Reschedule: key = now + interval
-        W1->>Stream: Update status cache
-        W1->>W1: gRPC → ontime-service record event
+        Note over W1: phase = FNV-1a(id) % interval → epoch + phase — ping 1 lần (chi tiết slide sau)
+        W1->>W1: Ping server/container (HTTP-DNS hoặc client-go)
+        W1->>Lua: Reschedule: key = phase + k*interval — cộng interval tới khi vượt now
       end
 
       Note over WN: tương tự shard N-1 (N mặc định 1)`,
+  },
+  {
+    id: 'ping-flow-k8s',
+    type: 'diagram',
+    title: 'Ping k8s API — check trạng thái',
+    diagram: `sequenceDiagram
+      autonumber
+      participant W1 as Worker (1 task)
+      participant K8S as Kubernetes API
+      participant Stream as Valkey
+
+      Note over W1: Server không có http_config — check trạng thái qua k8s API
+      alt kind == Pod
+        W1->>K8S: Get pod (namespace, object_id)
+        K8S-->>W1: Pod status
+        Note over W1: có container_name → check container Ready — ngược lại Pod Running + mọi container Ready
+      else Deployment / StatefulSet / DaemonSet / ReplicaSet
+        W1->>K8S: Get label selector (live — không cache)
+        K8S-->>W1: selector
+        W1->>K8S: List pods theo selector
+        K8S-->>W1: danh sách pod
+        Note over W1: pod nào container Ready (hoặc Pod Running) → up
+      end
+
+      W1->>Stream: Update status cache
+      W1->>W1: gRPC → ontime-service record event`,
+  },
+  {
+    id: 'ping-flow',
+    type: 'diagram',
+    title: 'Ping HTTP-DNS — resolve URL & stale domain',
+    diagram: `sequenceDiagram
+      autonumber
+      participant W1 as Worker (1 task)
+      participant DC as Domain Cache (Redis)
+      participant K8S as Kubernetes API
+      participant Stream as Valkey
+
+      Note over W1: Server có http_config — check qua HTTP, resolve URL trước
+      alt kind == Pod
+        Note over W1: DomainCache key = (namespace, kind, object_id) — TTL 1h — dùng chung cho mọi server trỏ cùng Pod
+        W1->>DC: GET scheduler:domain:(ns:kind:object)
+        alt hit
+          DC-->>W1: Pod IP cached
+        else miss
+          DC-->>W1: miss
+          W1->>K8S: ResolveDomainName (get Pod IP)
+          K8S-->>W1: Pod IP
+          W1->>DC: SET TTL 1h (best-effort)
+        end
+      else Service / StatefulSet
+        Note over W1: DNS compute trực tiếp — không đụng cache
+      end
+      W1->>W1: build URL + HTTP ping
+      alt ping fail & kind == Pod
+        W1->>K8S: CheckStale — resolve fresh
+        K8S-->>W1: domain mới
+        alt domain đổi
+          W1->>DC: DELETE key — meta cache còn nguyên
+          W1->>W1: skip event (ErrStaleDomain)
+        end
+      end
+
+      W1->>Stream: Update status cache
+      W1->>W1: gRPC → ontime-service record event`,
   },
 ]
