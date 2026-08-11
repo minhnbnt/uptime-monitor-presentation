@@ -33,11 +33,6 @@ export const auth = [
       actor User as Người dùng
       participant GT as GoTrue
       participant SRV as Service (HTTP)
-      participant JWKS as JWKS / OIDC Discovery
-
-      User->>GT: POST /signup (email, password)
-      GT->>GT: Tạo user, generate pair (JWT ES256)
-      GT-->>User: access_token + refresh_token
 
       User->>GT: POST /token (email + password)
       alt Sai
@@ -46,16 +41,38 @@ export const auth = [
         GT-->>User: access_token + refresh_token
       end
 
-      User->>GT: POST /token?grant_type=refresh
-      GT-->>User: access_token mới
-
       User->>SRV-Service: Request + Bearer access_token
-      SRV-Service->>JWKS: OIDC discovery (issuer/JWKS)
-      JWKS-->>SRV-Service: public key
+      SRV-Service->>GT: GET /.well-known/openid-configuration
+      GT-->>SRV-Service: issuer, JWKS endpoint
+      SRV-Service->>GT: GET /.well-known/jwks.json
+      GT-->>SRV-Service: public key
       SRV-Service->>SRV-Service: Verify JWT (iss, aud, exp), user_id = UUID sub
-      SRV-Service-->>User: 200 OK (user_id UUID từ token)
-
-      User->>GT: POST /logout
-      GT-->>User: 200 OK`,
+      SRV-Service-->>User: 200 OK (user_id UUID từ token)`,
+  },
+  {
+    id: 'design-search',
+    type: 'scheduling',
+    title: 'ParadeDB vs Elasticsearch',
+    subtitle: 'Tại sao chọn ParadeDB?',
+    highlight: 'right',
+    leftIcon: 'E',
+    left: {
+      title: 'Elasticsearch (thông thường)',
+      items: [
+        'Hạ tầng độc lập: phải vận hành, backup, đồng bộ index riêng với database chính',
+        'Query DSL (JSON) riêng, khác hẳn SQL quen thuộc',
+      ],
+    },
+    rightIcon: 'P',
+    right: {
+      title: 'ParadeDB (pg_search) — dự án chọn',
+      items: [
+        'Extension pg_search chạy ngay trong Postgres của server-service, chỉ mục BM25',
+        'Index nằm cùng transaction với dữ liệu gốc, không độ trễ đồng bộ, không thêm hạ tầng',
+        'SQL/GORM quen thuộc, không cần học Query DSL hay client riêng',
+        'Mã nguồn mở (AGPLv3), không lệ thuộc license thương mại',
+      ],
+    },
+    note: 'Đánh đổi: chỉ mục BM25 không ghi theo WAL chuẩn — có thể hỏng/lệch khi Postgres crash đột ngột, cần rebuild lại. Dữ liệu gốc vẫn được WAL bảo vệ. Đổi lấy: bớt hẳn một hạ tầng search + pipeline đồng bộ.',
   },
 ]

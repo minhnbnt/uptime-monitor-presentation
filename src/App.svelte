@@ -276,24 +276,30 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div class="card">
                 <div class="flex items-center gap-2 mb-3">
-                  <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-cta-dim text-cta text-sm font-bold">Z</span>
-                  <h3 class="font-heading font-semibold text-text text-sm">{slides[current].zset.title}</h3>
+                  <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-cta-dim text-cta text-sm font-bold">{slides[current].leftIcon ?? 'Z'}</span>
+                  <h3 class="font-heading font-semibold text-text text-sm">{(slides[current].left ?? slides[current].zset).title}</h3>
+                  {#if slides[current].highlight === 'left'}
+                    <span class="ml-auto px-2 py-0.5 rounded-full bg-cta text-bg text-xs font-heading font-semibold">Chọn</span>
+                  {/if}
                 </div>
                 <ul class="space-y-1.5">
-                  {#each slides[current].zset.items as item (item)}
+                  {#each (slides[current].left ?? slides[current].zset).items as item (item)}
                     <li class="pl-4 relative text-text-muted text-sm leading-snug
                       before:content-[''] before:absolute before:left-0 before:top-[0.55em]
                       before:w-1 before:h-1 before:rounded-full before:bg-cta/60">{item}</li>
                   {/each}
                 </ul>
               </div>
-              <div class="card">
+              <div class="card {slides[current].highlight === 'right' ? 'border-cta/50 ring-1 ring-cta/30 bg-cta-dim/30' : ''}">
                 <div class="flex items-center gap-2 mb-3">
-                  <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-500/15 text-blue-400 text-sm font-bold">T</span>
-                  <h3 class="font-heading font-semibold text-text text-sm">{slides[current].temporal.title}</h3>
+                  <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-blue-500/15 text-blue-400 text-sm font-bold">{slides[current].rightIcon ?? 'T'}</span>
+                  <h3 class="font-heading font-semibold text-text text-sm">{(slides[current].right ?? slides[current].temporal).title}</h3>
+                  {#if slides[current].highlight === 'right'}
+                    <span class="ml-auto px-2 py-0.5 rounded-full bg-cta text-bg text-xs font-heading font-semibold">Chọn</span>
+                  {/if}
                 </div>
                 <ul class="space-y-1.5">
-                  {#each slides[current].temporal.items as item (item)}
+                  {#each (slides[current].right ?? slides[current].temporal).items as item (item)}
                     <li class="pl-4 relative text-text-muted text-sm leading-snug
                       before:content-[''] before:absolute before:left-0 before:top-[0.55em]
                       before:w-1 before:h-1 before:rounded-full before:bg-blue-400/60">{item}</li>
@@ -335,6 +341,11 @@
                 </ul>
               </div>
             </div>
+            {#if slides[current].note}
+              <div class="mt-5 px-4 py-2.5 rounded-lg bg-cta-dim border border-cta/10 text-center">
+                <p class="text-text-muted text-xs">{slides[current].note}</p>
+              </div>
+            {/if}
           </div>
 
         {:else if slides[current].type === 'card-grid'}

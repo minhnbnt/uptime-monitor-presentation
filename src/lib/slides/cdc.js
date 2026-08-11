@@ -48,6 +48,30 @@ export const cdc = [
       ONT-->>SRV: online/offline count`,
   },
   {
+    id: 'cdc-design',
+    type: 'scheduling',
+    title: 'Debezium Server vs Kafka Connect',
+    subtitle: 'Tại sao chọn Debezium Server?',
+    highlight: 'right',
+    leftIcon: 'D',
+    left: {
+      title: 'Kafka Connect (thông thường)',
+      items: [
+        'Phải vận hành thêm cụm Kafka',
+        'Tạo connector qua REST API + JSON config',
+      ],
+    },
+    rightIcon: 'S',
+    right: {
+      title: 'Debezium Server (dự án chọn)',
+      items: [
+        'Một service, cấu hình bằng file YAML — khởi động là chạy',
+        'Sink thẳng vào Redis đã có sẵn, không thêm broker mới',
+      ],
+    },
+    note: 'Đánh đổi: mất tiện ích vận hành của Kafka Connect, phải tự viết phần consumer. Đổi lấy: vận hành đơn giản hơn, tận dụng lại Redis.',
+  },
+  {
     id: 'cdc-ui',
     type: 'screenshot',
     title: 'Giao diện sử dụng ownership đã replicate',

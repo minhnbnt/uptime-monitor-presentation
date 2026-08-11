@@ -155,12 +155,12 @@ export const scheduling = [
       participant Router as ping-service Router
       participant W1 as Worker shard 0
       participant WN as Worker shard N-1
-      participant Lua as Lua (per shard)
+      participant Lua as Valkey (Lua per shard)
 
       DEB->>Stream: servers change event
       Stream-->>Router: consume (consumer group)
       Note over Router: shard = fnv32a(serverID) % N
-      Router->>Lua: ZADD scheduler:queue:<shard>
+      Router->>Lua: ZADD scheduler:queue:<shard> (EVAL script)
 
       loop Mỗi shard: goroutine riêng, mỗi 5s
         W1->>Lua: ClaimDueTasksForShard(0, limit, lockMs=10000)

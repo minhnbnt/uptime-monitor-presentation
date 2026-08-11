@@ -41,7 +41,6 @@ export const features = [
     diagram: `sequenceDiagram
       autonumber
       actor User
-      participant GW as Cilium Gateway
       participant SRV as server-service
       participant K8S as Kubernetes API
       participant DB as Postgres (server DB)
@@ -50,8 +49,7 @@ export const features = [
       participant PING as ping-service
       participant ONT as ontime-service
 
-      User->>GW: POST /api/v1/k8s-objects (JWT)
-      GW->>SRV: reverse proxy
+      User->>SRV: POST /api/v1/k8s-objects (JWT)
       SRV->>SRV: verify JWT (GoTrue OIDC)
       SRV->>K8S: EnsureNamespace + CreateServer
       K8S-->>SRV: server created
@@ -78,23 +76,20 @@ export const features = [
     diagram: `sequenceDiagram
       autonumber
       actor User
-      participant GW as Cilium Gateway
       participant SRV as server-service
       participant DB as Postgres (server DB)
       participant ONT as ontime-service
       participant Redis as Valkey
       participant ADB as Postgres (analytics DB)
 
-      User->>GW: GET /api/v1/servers/{id} (JWT)
-      GW->>SRV: reverse proxy
+      User->>SRV: GET /api/v1/servers/{id} (JWT)
       SRV->>DB: SELECT servers WHERE id
       SRV->>ONT: gRPC GetCurrentStatuses
       ONT->>ADB: latest event per server (DISTINCT ON)
       ADB-->>ONT: ON/OFF status
       ONT-->>SRV: monitor_status
       SRV-->>User: server metadata + status
-      User->>GW: GET /api/v1/servers/ontime/{id}
-      GW->>ONT: reverse proxy
+      User->>ONT: GET /api/v1/servers/ontime/{id}
       ONT->>SRV: gRPC GetServer (ownership check)
       SRV-->>ONT: ServerBrief
       ONT->>Redis: MGET ontime:{id}:{date}:stats (30 ngày)
@@ -120,13 +115,11 @@ export const features = [
     diagram: `sequenceDiagram
       autonumber
       actor User
-      participant GW as Cilium Gateway
       participant SRV as server-service
       participant PDB as ParadeDB (pg_search)
       participant ONT as ontime-service
 
-      User->>GW: GET /api/v1/servers/search?q=&sort_by=score (JWT)
-      GW->>SRV: reverse proxy
+      User->>SRV: GET /api/v1/servers/search?q=&sort_by=score (JWT)
       SRV->>PDB: BM25 query (name @@@ ?, LIMIT/OFFSET)
       PDB-->>SRV: rows + total
       SRV->>ONT: gRPC GetCurrentStatuses
@@ -147,7 +140,6 @@ export const features = [
     diagram: `sequenceDiagram
       autonumber
       actor User
-      participant GW as Cilium Gateway
       participant IMP as importer-service
       participant SRV as server-service
       participant DB as Postgres (server DB)
@@ -155,8 +147,7 @@ export const features = [
       participant Redis as Redis Stream
 
       Note over User,Redis: Import — POST /api/v1/servers/import (multipart file)
-      User->>GW: POST /import (JWT)
-      GW->>IMP: reverse proxy
+      User->>IMP: POST /import (JWT)
       IMP->>IMP: excelize parse + validate từng dòng
       loop chunk 100 rows
         IMP->>SRV: gRPC BatchCreateServers
@@ -168,8 +159,7 @@ export const features = [
       DEB->>Redis: uptime.public.servers (bulk)
 
       Note over User,Redis: Export — GET /api/v1/servers/export
-      User->>GW: GET /export?q=&sort_by= (JWT)
-      GW->>IMP: reverse proxy
+      User->>IMP: GET /export?q=&sort_by= (JWT)
       IMP->>SRV: gRPC SearchServers
       SRV-->>IMP: ServerWithEndpoint[]
       IMP->>IMP: excelize generate xlsx
@@ -189,7 +179,6 @@ export const features = [
     diagram: `sequenceDiagram
       autonumber
       actor User
-      participant GW as Cilium Gateway
       participant NOT as notification-service
       participant TEMP as Temporal
       participant GT as GoTrue
@@ -200,15 +189,13 @@ export const features = [
       participant SMTP as SMTP/Mailpit
 
       Note over User,SMTP: Cấu hình — PUT /api/v1/notifications/config
-      User->>GW: PUT /config (JWT)
-      GW->>NOT: reverse proxy
+      User->>NOT: PUT /config (JWT)
       NOT->>TEMP: UpsertSchedule digest-user-{uuid}
       TEMP-->>NOT: schedule saved
       NOT-->>User: 200
 
       Note over User,SMTP: On-demand — POST /api/v1/notifications/send-report
-      User->>GW: POST /send-report (JWT)
-      GW->>NOT: reverse proxy
+      User->>NOT: POST /send-report (JWT)
       NOT->>TEMP: DescribeSchedule (precondition)
       NOT->>TEMP: ExecuteWorkflow send-report
       NOT-->>User: 200 (fire-and-forget)

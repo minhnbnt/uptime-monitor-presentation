@@ -11,7 +11,7 @@ export const architecture = [
     title: 'Tech Stack',
     items: [
       { icon: 'Go', name: 'Go 1.26', desc: '5 microservices + GoTrue, mỗi service một Go module riêng' },
-      { icon: 'PG', name: 'ParadeDB', desc: 'PostgreSQL + pg_search (BM25 full-text), database riêng cho server/analytics/notification + GoTrue' },
+      { icon: 'PG', name: 'ParadeDB', desc: 'PostgreSQL + pg_search (BM25 full-text), database riêng cho server/analytics + GoTrue' },
       { icon: 'Re', name: 'Valkey (Redis)', desc: 'ZSET scheduler + cache + CDC stream transport' },
       { icon: 'Te', name: 'Temporal', desc: 'Workflow engine (SendReport digest, chỉ notification-service dùng)' },
       { icon: 'GT', name: 'GoTrue', desc: 'Auth tập trung chuẩn OIDC: signup/login/refresh/logout, JWT ES256, user_id = UUID sub' },
@@ -38,7 +38,7 @@ export const architecture = [
     title: 'Hạ tầng dùng chung',
     items: [
       { icon: '🌐', name: 'Cilium', desc: 'Reverse proxy (Envoy, Gateway API): route theo HTTPRoute + CORS. Network Policy kiểm soát traffic giữa các service' },
-      { icon: '🐘', name: 'PostgreSQL (ParadeDB)', desc: 'wal_level=logical, BM25 full-text search, database riêng (server/analytics/notification) + GoTrue' },
+      { icon: '🐘', name: 'PostgreSQL (ParadeDB)', desc: 'wal_level=logical, BM25 full-text search, database riêng (server/analytics) + GoTrue' },
       { icon: '🔄', name: 'PgBouncer', desc: 'Connection pooling transaction mode cho tất cả service' },
       { icon: '⚡', name: 'Valkey (Redis)', desc: 'appendonly=yes. ZSET scheduler + cache + CDC stream transport' },
       { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream (uptime.public.servers): ping-service (scheduler) + ontime-service (ownership)' },
@@ -57,7 +57,7 @@ export const architecture = [
     title: 'Luồng dữ liệu tổng quan',
     diagram: `flowchart TB
       Client -->|REST / OpenAPI| TR[Cilium API Gateway]
-      Client -->|REST signup/login| GT[GoTrue]
+      TR -->|/auth/* signup, login, JWT| GT[GoTrue]
 
       TR -->|/api/v1/servers/*| SRV[server-service]
       TR -->|/api/v1/servers/ontime/*| ONT[ontime-service]
@@ -71,7 +71,6 @@ export const architecture = [
 
       SRV --> PB[PgBouncer]
       ONT --> PB
-      NOT --> PB
       PB --> PG[(Postgres + pg_search)]
 
       PING[ping-service] -->|gRPC GetServers| SRV
@@ -83,6 +82,7 @@ export const architecture = [
 
       PING -->|ZSET claim| Redis[(Valkey / Redis)]
       PING -->|client-go query server status| K8S[(Kubernetes API)]
+      SRV -->|client-go verify k8s identity| K8S
 
       PG -->|logical WAL| DEB[Debezium]
       DEB -->|Redis Stream servers| Redis
