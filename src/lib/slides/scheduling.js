@@ -215,21 +215,20 @@ export const scheduling = [
     diagram: `sequenceDiagram
       autonumber
       participant W1 as Worker (1 task)
-      participant DC as Domain Cache (Redis)
+      participant V as Valkey (Domain + status cache)
       participant K8S as Kubernetes API
-      participant Stream as Valkey
 
       Note over W1: Server có http_config — check qua HTTP, resolve URL trước
       alt kind == Pod
         Note over W1: DomainCache key = (namespace, kind, object_id) — TTL 1h — dùng chung cho mọi server trỏ cùng Pod
-        W1->>DC: GET scheduler:domain:(ns:kind:object)
+        W1->>V: GET scheduler:domain:(ns:kind:object)
         alt hit
-          DC-->>W1: Pod IP cached
+          V-->>W1: Pod IP cached
         else miss
-          DC-->>W1: miss
+          V-->>W1: miss
           W1->>K8S: ResolveDomainName (get Pod IP)
           K8S-->>W1: Pod IP
-          W1->>DC: SET TTL 1h (best-effort)
+          W1->>V: SET TTL 1h (best-effort)
         end
       else Service / StatefulSet
         Note over W1: DNS compute trực tiếp — không đụng cache
@@ -239,12 +238,12 @@ export const scheduling = [
         W1->>K8S: CheckStale — resolve fresh
         K8S-->>W1: domain mới
         alt domain đổi
-          W1->>DC: DELETE key — meta cache còn nguyên
+          W1->>V: DELETE key — meta cache còn nguyên
           W1->>W1: skip event (ErrStaleDomain)
         end
       end
 
-      W1->>Stream: Update status cache
+      W1->>V: Update status cache
       W1->>W1: gRPC → ontime-service record event`,
   },
 ]
