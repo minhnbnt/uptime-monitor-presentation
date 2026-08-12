@@ -89,17 +89,16 @@ export const features = [
       ADB-->>ONT: ON/OFF status
       ONT-->>SRV: monitor_status
       SRV-->>User: server metadata + status
-      User->>ONT: GET /api/v1/servers/ontime/{id}
-      ONT->>SRV: gRPC GetServer (ownership check)
-      SRV-->>ONT: ServerBrief
-      ONT->>Redis: MGET ontime:{id}:{date}:stats (30 ngày)
+      User->>ONT: GET /api/v1/servers/ontime/{id} (JWT)
+      ONT->>ADB: SELECT server_owners WHERE user_id AND server_id IN (ids)
+      ONT->>Redis: MGET ontime:{id}:{date}:stats (30 ngày) — chỉ server user sở hữu
       alt cache miss
         ONT->>ADB: query server_events (lowerbound + day events)
         ADB-->>ONT: events
         Note over ONT: CalculateDayOntime
         ONT->>Redis: MSet (TTL: 1h / today 10s)
       end
-      ONT-->>User: ontime_stats (30 ngày)`,
+      ONT-->>User: ontime_stats (30 ngày, chỉ các server thuộc user)`,
   },
   {
     id: 'ss-search',
