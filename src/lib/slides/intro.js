@@ -48,7 +48,6 @@ export const intro = [
       'Phần lớn file ≤ 200 dòng',
       'Stateless, dễ scale (microservices)',
       'Code tổ chức tốt, dễ bảo trì',
-      'Có logs cấu trúc + rotation',
     ],
   },
 ]
