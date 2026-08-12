@@ -28,7 +28,7 @@ export const deployment = [
       {
         icon: '🌐',
         title: 'Cilium',
-        desc: 'Reverse proxy (Envoy, Gateway API) chỉ route HTTP theo HTTPRoute; Network Policy giới hạn traffic giữa service',
+        desc: 'Reverse proxy (Envoy, Gateway API); Network Policy giới hạn traffic giữa service',
       },
       {
         icon: '🔐',
