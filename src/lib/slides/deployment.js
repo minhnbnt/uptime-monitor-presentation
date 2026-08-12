@@ -11,14 +11,14 @@ export const deployment = [
     title: 'Đóng gói & Triển khai',
     items: [
       {
-        icon: '🐳',
-        title: 'Docker Multi-stage',
+        icon: '📦',
+        title: 'Container Multi-stage',
         desc: 'golang:1.26-alpine → UPX compress → distroless nonroot',
       },
       {
         icon: '☸️',
         title: 'Talos Linux',
-        desc: 'OS tối giản, bất biến, chuyên cho Kubernetes — không SSH, không shell, bootstrap bằng OpenTofu, upgrade atomic',
+        desc: 'OS tối giản, bất biến, chuyên cho Kubernetes — không SSH, không shell, bootstrap bằng OpenTofu',
       },
       {
         icon: '☸️',

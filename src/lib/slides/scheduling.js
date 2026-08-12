@@ -105,6 +105,7 @@ export const scheduling = [
       title: 'Vấn đề',
       items: [
         'Tạo nhiều server cùng lúc → check dồn vào cùng thời điểm, tải không đều',
+        'Redis chạy theo cụm (cluster) → cần phân bố tải/dữ liệu đều ra nhiều node',
         'Cần tra cứu nhanh các task vừa đến hạn',
         'Tránh race condition khi nhiều worker chạy song song',
       ],
