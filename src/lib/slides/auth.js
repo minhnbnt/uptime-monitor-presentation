@@ -8,46 +8,46 @@ export const auth = [
   {
     id: 'auth-oidc',
     type: 'two-column',
-    title: 'Xác thực tập trung qua GoTrue + OIDC',
+    title: 'Xác thực tập trung qua auth-service + forward-auth',
     left: {
       title: 'Vấn đề',
       items: [
-        'auth-service tự viết thì phải tự code & maintain toàn bộ auth (signup, login, JWT, hash)',
-        'Rotate khóa phải deploy lại toàn bộ service',
+        'Mỗi service tự verify JWT → trùng lặp code xác thực, secret JWT bị phân tán ra nhiều nơi',
+        'Nếu đổi cách verify (algorithm, claim) phải deploy lại tất cả service',
       ],
     },
     right: {
       title: 'Giải pháp',
       items: [
-        'GoTrue chuẩn OIDC có sẵn → không cần code nhiều, không phải tự maintain auth',
-        'OIDC discovery giúp phân phối key dễ dàng — service lấy public key từ JWKS',
-        'Dễ dàng rotate khi cần — chỉ thay đổi một nơi, các service tự nhận key mới',
+        'auth-service tự viết ký JWT HS256 (shared secret), cấp access/refresh + session (Argon2 hash)',
+        'Traefik forward-auth (/auth/verify) verify token 1 lần duy nhất, inject header X-User-ID / X-Scopes / X-Session-ID',
+        'Service chỉ đọc header qua common/authclient, không bao giờ thấy/verify JWT → rotate key tại auth-service, không redeploy service khác',
       ],
     },
   },
   {
     id: 'auth-flow',
     type: 'diagram',
-    title: 'Auth Flow — GoTrue & OIDC verify',
+    title: 'Auth Flow — auth-service & Traefik forward-auth',
     diagram: `sequenceDiagram
       actor User as Người dùng
-      participant GT as GoTrue
+      participant TR as Traefik
+      participant AUTH as auth-service
       participant SRV as Service (HTTP)
 
-      User->>GT: POST /token (email + password)
+      User->>AUTH: POST /api/v1/auth/login (email + password)
       alt Sai
-        GT-->>User: 401 Unauthorized
+        AUTH-->>User: 401 Unauthorized
       else Đúng
-        GT-->>User: access_token + refresh_token
+        AUTH-->>User: access_token + refresh_token
       end
 
-      User->>SRV-Service: Request + Bearer access_token
-      SRV-Service->>GT: GET /.well-known/openid-configuration
-      GT-->>SRV-Service: issuer, JWKS endpoint
-      SRV-Service->>GT: GET /.well-known/jwks.json
-      GT-->>SRV-Service: public key
-      SRV-Service->>SRV-Service: Verify JWT (iss, aud, exp), user_id = UUID sub
-      SRV-Service-->>User: 200 OK (user_id UUID từ token)`,
+      User->>TR: Request + Bearer access_token
+      TR->>AUTH: forward-auth /auth/verify (token)
+      AUTH-->>TR: 200 + X-User-ID, X-Scopes, X-Session-ID
+      TR->>SRV: Request + header X-User-ID
+      SRV->>SRV: authclient.GetUserID(ctx) → user_id (uint)
+      SRV-->>User: 200 OK (user_id từ header)`,
   },
   {
     id: 'design-search',

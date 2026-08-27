@@ -4,7 +4,7 @@ export const intro = [
     type: 'title',
     title: 'Server Management System',
     subtitle: 'Hệ thống quản lý server',
-    meta: 'System Design — Go • gRPC • PostgreSQL • Kubernetes • GoTrue/OIDC • Redis • Temporal • Debezium • Cilium',
+    meta: 'System Design — Go • gRPC • PostgreSQL • Traefik • Redis • Temporal • Debezium',
   },
   {
     id: 'agenda',
@@ -30,10 +30,10 @@ export const intro = [
     type: 'requirements',
     title: 'Yêu cầu chức năng',
     func: [
-      'Đăng ký / Đăng nhập tài khoản bằng email (GoTrue)',
-      'Quản lý server (CRUD)',
-      'Giám sát server theo k8s identity (namespace, kind, object_id)',
-      'Kiểm tra trạng thái server/container tự động theo lịch (interval cấu hình được)',
+       'Đăng ký / Đăng nhập tài khoản bằng email (auth-service)',
+       'Quản lý server (CRUD)',
+       'Giám sát endpoint qua HTTP/DNS (URL, method, interval, timeout, expected_code)',
+       'Kiểm tra trạng thái endpoint (HTTP/DNS) tự động theo lịch (interval cấu hình được)',
       'Xem tỉ lệ uptime theo ngày/khoảng thời gian',
       'Tìm kiếm server full-text',
       'Xuất / Nhập danh sách server từ Excel',

@@ -85,7 +85,7 @@ export const scheduling = [
     left: {
       title: 'Vấn đề',
       items: [
-        'Cần biết ngay khi server (k8s object) mới được tạo/sửa/xóa để thêm/xóa task, invalidate cache khi có thay đổi',
+        'Cần biết ngay khi server/endpoint mới được tạo/sửa/xóa để thêm/xóa task, invalidate cache khi có thay đổi',
         'Polling DB liên tục tốn tài nguyên, độ trễ cao',
       ],
     },
@@ -124,11 +124,11 @@ export const scheduling = [
     id: 'scheduling-compare',
     type: 'scheduling',
     title: 'Temporal vs Redis ZSET',
-    subtitle: 'Tại sao dùng cả hai?',
+    subtitle: 'Tại sao ZSET cho ping, Temporal chỉ cho mail',
     zset: {
       title: 'Redis ZSET cho Ping',
       items: [
-        'Tần suất rất cao: 10.000 server × mỗi 30s',
+        'Tần suất rất cao: 10.000 endpoint × mỗi 30s',
         'AOF always: không mất task sau downtime',
         'Lua atomic claim: tránh race condition giữa worker',
         'Sharding fnv32a(serverID) % N: giảm contention, phân tải đều',
@@ -143,7 +143,7 @@ export const scheduling = [
         'Phù hợp low-frequency + độ bền cao',
       ],
     },
-    note: 'Chi phí ghi log Temporal không phù hợp với 10k server. ZSET custom cho high-frequency, Temporal cho low-frequency + durability.',
+    note: 'Temporal KHÔNG dùng cho ping (config ping-workflow trong server-service chỉ là phần thừa của bản cũ). ZSET custom cho high-frequency, Temporal cho low-frequency + durability.',
   },
   {
     id: 'zset-loop',
@@ -172,78 +172,72 @@ export const scheduling = [
         Lua-->>W1: dueTasks[], nextTask[]
       end
 
-      loop Each due task (per shard)
-        W1->>Lua: Load task info
-        Lua-->>W1: server, namespace, kind, object_id
-        Note over W1: phase = FNV-1a(id) % interval → epoch + phase — ping 1 lần (chi tiết slide sau)
-        W1->>W1: Ping server/container (HTTP-DNS hoặc client-go)
-        W1->>Lua: Reschedule: key = phase + k*interval — cộng interval tới khi vượt now
-      end
+       loop Each due task (per shard)
+         W1->>Lua: Load task info
+         Lua-->>W1: endpoint URL, method, interval, timeout, expected_code
+         Note over W1: phase = FNV-1a(id) % interval → epoch + phase — ping 1 lần (chi tiết slide sau)
+         W1->>W1: Ping HTTP/DNS (net/http → so sánh StatusCode / BodyCheckExpr)
+         W1->>Lua: Reschedule: key = phase + k*interval — cộng interval tới khi vượt now
+       end
 
       Note over WN: tương tự shard N-1 (N mặc định 1)`,
   },
   {
-    id: 'ping-flow-k8s',
-    type: 'diagram',
-    title: 'Ping k8s API — check trạng thái',
-    diagram: `sequenceDiagram
-      autonumber
-      participant W1 as Worker (1 task)
-      participant K8S as Kubernetes API
-      participant Stream as Valkey
-
-      Note over W1: Server không có http_config — check trạng thái qua k8s API
-      alt kind == Pod
-        W1->>K8S: Get pod (namespace, object_id)
-        K8S-->>W1: Pod status
-        Note over W1: có container_name → check container Ready — ngược lại Pod Running + mọi container Ready
-      else Deployment / StatefulSet / DaemonSet / ReplicaSet
-        W1->>K8S: Get label selector (live — không cache)
-        K8S-->>W1: selector
-        W1->>K8S: List pods theo selector
-        K8S-->>W1: danh sách pod
-        Note over W1: pod nào container Ready (hoặc Pod Running) → up
-      end
-
-      W1->>Stream: Update status cache
-      W1->>W1: gRPC → ontime-service record event`,
+    id: 'zset-visual',
+    type: 'erd',
+    title: 'Cơ chế điều độ Redis ZSET (minh họa)',
+    caption: 'Task theo score (thời điểm chạy). Lua claim lấy các task ≤ now (+lock 10s), peek 1 next task, còn lại không lấy.',
+    src: 'assets/zset_scheduler.svg',
+  },
+  {
+    id: 'offset-hash-cpu',
+    type: 'erd',
+    title: 'Offset băm — phẳng hóa CPU (minh họa)',
+    caption: 'Không offset: mọi task chạy cùng lúc mỗi interval → CPU spike. Có offset = hash(id) % interval: task dàn đều → CPU phẳng.',
+    src: 'assets/offset_hash_cpu_comparison_smooth.svg',
   },
   {
     id: 'ping-flow',
     type: 'diagram',
-    title: 'Ping HTTP-DNS — resolve URL & stale domain',
+    title: 'Ping HTTP/DNS — check endpoint',
     diagram: `sequenceDiagram
       autonumber
       participant W1 as Worker (1 task)
-      participant V as Valkey (Domain + status cache)
-      participant K8S as Kubernetes API
+      participant V as Valkey (status cache)
+      participant EP as Target Endpoint
 
-      Note over W1: Server có http_config — check qua HTTP, resolve URL trước
-      alt kind == Pod
-        Note over W1: DomainCache key = (namespace, kind, object_id) — TTL 1h — dùng chung cho mọi server trỏ cùng Pod
-        W1->>V: GET scheduler:domain:(ns:kind:object)
-        alt hit
-          V-->>W1: Pod IP cached
-        else miss
-          V-->>W1: miss
-          W1->>K8S: ResolveDomainName (get Pod IP)
-          K8S-->>W1: Pod IP
-          W1->>V: SET TTL 1h (best-effort)
-        end
-      else Service / StatefulSet
-        Note over W1: DNS compute trực tiếp — không đụng cache
+      Note over W1: Server có endpoint (url, method, interval, expected_code)
+      W1->>W1: build request (method + url, timeout)
+      W1->>EP: net/http GET/POST url
+      EP-->>W1: StatusCode + Body
+      W1->>W1: StatusCode == expected_code? + BodyCheckExpr
+      alt khớp
+        Note over W1: ON
+      else không khớp
+        Note over W1: OFF
       end
-      W1->>W1: build URL + HTTP ping
-      alt ping fail & kind == Pod
-        W1->>K8S: CheckStale — resolve fresh
-        K8S-->>W1: domain mới
-        alt domain đổi
-          W1->>V: DELETE key — meta cache còn nguyên
-          W1->>W1: skip event (ErrStaleDomain)
-        end
-      end
-
-      W1->>V: Update status cache
-      W1->>W1: gRPC → ontime-service record event`,
+      W1->>V: Update status cache (endpoint:status)
+      W1->>W1: gRPC RecordEvent → ontime-service (nếu trạng thái đổi)`,
+  },
+  {
+    id: 'push-agent',
+    type: 'two-column',
+    title: 'Push Agent (hybrid monitoring)',
+    left: {
+      title: 'Vấn đề',
+      items: [
+        'Một số server nằm sau NAT/firewall — ping-service không thể chủ động ping tới',
+        'Chỉ có pull probe thì thiếu trạng thái của các host không reachable từ ngoài',
+      ],
+    },
+    right: {
+      title: 'Giải pháp — ping-agent (Python)',
+      items: [
+        'Agent chạy trên server đích, POST /api/v1/ping/events báo trạng thái ON/OFF',
+        'Đăng nhập → /auth/sessions/ping lấy token scope "ping"; refresh trước 60s khi hết hạn',
+        'Cùng pipeline RecordStatusWorker với pull probe (dedup Redis + ontime DB)',
+        'Rate-limit per-session (hash session_id) tránh spam event',
+      ],
+    },
   },
 ]

@@ -12,8 +12,8 @@ export const features = [
     left: {
       title: 'CRUD Server',
       items: [
-        'Tạo, xem, sửa, xóa server bằng k8s identity (namespace, kind, object_id, container_name)',
-        'Test-server: truy vấn server/container status qua k8s API trước khi lưu',
+        'Tạo, xem, sửa, xóa server + endpoint (URL, method, interval, timeout, expected_code)',
+        'Test-server: ping HTTP/DNS thử ngay trước khi lưu',
         'Import hàng loạt từ CSV/Excel, kết quả theo từng dòng (row-level)',
       ],
     },
@@ -31,7 +31,7 @@ export const features = [
     id: 'ss-create',
     type: 'screenshot',
     title: 'Tạo Server & Cấu hình Check',
-    caption: 'Form tạo server: k8s identity (namespace, kind, object), interval, timeout, container',
+    caption: 'Form tạo server: endpoint (URL, method, interval, timeout, expected_code)',
     src: 'assets/screenshots/create-pod.png',
   },
   {
@@ -42,22 +42,19 @@ export const features = [
       autonumber
       actor User
       participant SRV as server-service
-      participant K8S as Kubernetes API
       participant DB as Postgres (server DB)
       participant DEB as Debezium
       participant Redis as Redis Stream
       participant PING as ping-service
       participant ONT as ontime-service
 
-      User->>SRV: POST /api/v1/k8s-objects (JWT)
-      SRV->>SRV: verify JWT (GoTrue OIDC)
-      SRV->>K8S: EnsureNamespace + CreateServer
-      K8S-->>SRV: server created
-      SRV->>DB: INSERT servers + server_http_configs (txn)
+      User->>SRV: POST /api/v1/servers (JWT, endpoint URL/HTTP)
+      SRV->>SRV: Traefik forward-auth đã inject X-User-ID
+      SRV->>DB: INSERT servers + endpoints (txn)
       SRV-->>User: ServerObject (server + check config)
       DB->>DEB: logical WAL
-      DEB->>Redis: uptime.public.servers
-      Redis-->>PING: ServerEventHandler
+      DEB->>Redis: uptime.public.servers + uptime.public.endpoints
+      Redis-->>PING: ServerEventHandler + EndpointEventHandler
       PING->>Redis: ZADD scheduler:queue:<shard>
       Redis-->>ONT: OwnershipConsumer
       ONT->>ONT: upsert server_owners (analytics)`,
@@ -66,7 +63,7 @@ export const features = [
     id: 'ss-detail',
     type: 'screenshot',
     title: 'Server Detail & Uptime',
-    caption: 'Chi tiết server: k8s identity, trạng thái server, uptime chart 30 ngày',
+    caption: 'Chi tiết server: endpoint, trạng thái server, uptime chart 30 ngày',
     src: 'assets/screenshots/server-detail.png',
   },
   {
@@ -180,7 +177,7 @@ export const features = [
       actor User
       participant NOT as notification-service
       participant TEMP as Temporal
-      participant GT as GoTrue
+      participant AUTH as auth-service
       participant SRV as server-service
       participant ONT as ontime-service
       participant Redis as Valkey
@@ -201,7 +198,7 @@ export const features = [
 
       Note over User,SMTP: Worker pipeline (Temporal trigger)
       TEMP->>NOT: trigger send-report workflow
-      NOT->>GT: HTTP admin/users/{id} → email
+      NOT->>AUTH: HTTP /api/v1/auth/private/users/{id} → email
       NOT->>SRV: gRPC ListServers + CountServersByStatus
       SRV->>ONT: gRPC CountByStatus
       NOT->>ONT: gRPC GetServersOntime
@@ -222,7 +219,7 @@ export const features = [
     left: {
       title: 'CRUD Server (server-service)',
       items: [
-        'Mỗi server định danh bằng k8s object (namespace, kind, object_id)',
+        'Mỗi server định danh bằng endpoint (URL, method, interval)',
         'Dữ liệu phân tách theo user (created_by_id UUID)',
         'Cleanup scheduler + cache khi xoá',
         'Handler → Service → Repository → DB',

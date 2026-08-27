@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 450" role="img">
+  <title>So sánh CPU usage: có và không có offset băm</title>
+  <desc>Hai timeline CPU usage. Trên: không offset, tất cả task chạy cùng lúc tạo spike. Dưới: dùng offset hash % interval, task phân bố đều, CPU phẳng.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+
+  <!-- dark background so the figure is dark by default -->
+  <rect x="0" y="0" width="680" height="450" rx="12" fill="#0b1120"/>
+
+  <text x="340" y="58" text-anchor="middle" fill="#fb923c" font-family="Segoe UI, system-ui, sans-serif" font-size="14" font-weight="500">Không dùng offset — CPU bị spike</text>
+  <text x="340" y="76" text-anchor="middle" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">Tất cả task chạy cùng lúc mỗi interval</text>
+
+  <text x="60" y="100" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">CPU usage</text>
+  <line x1="60" y1="190" x2="630" y2="190" stroke="#475569" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="60" y="222" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">thời gian</text>
+
+  <path d="M60,182 L130,182 C155,182 165,100 180,100 C195,100 205,182 230,182 L330,182 C355,182 365,100 380,100 C395,100 405,182 430,182 L530,182 C555,182 565,100 580,100 C595,100 605,182 630,182" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="280" y="150" text-anchor="middle" fill="#fb923c" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">nhiều task chạy cùng lúc</text>
+
+  <text x="340" y="278" text-anchor="middle" fill="#86efac" font-family="Segoe UI, system-ui, sans-serif" font-size="14" font-weight="500">Có offset (hash % interval) — CPU phẳng</text>
+  <text x="340" y="296" text-anchor="middle" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">Task phân bố đều theo thời gian</text>
+
+  <text x="60" y="320" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">CPU usage</text>
+  <line x1="60" y1="410" x2="630" y2="410" stroke="#475569" stroke-width="1" marker-end="url(#arrow)"/>
+  <text x="60" y="427" fill="#64748b" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">thời gian</text>
+
+  <path d="M60,395 C120,390 160,400 220,395 C280,390 320,400 380,395 C440,390 480,400 540,395 C580,392 600,398 630,395" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="100" cy="394" r="3" fill="#34d399"/>
+  <circle cx="160" cy="396" r="3" fill="#34d399"/>
+  <circle cx="230" cy="393" r="3" fill="#34d399"/>
+  <circle cx="300" cy="397" r="3" fill="#34d399"/>
+  <circle cx="370" cy="394" r="3" fill="#34d399"/>
+  <circle cx="440" cy="396" r="3" fill="#34d399"/>
+  <circle cx="510" cy="393" r="3" fill="#34d399"/>
+  <circle cx="580" cy="395" r="3" fill="#34d399"/>
+  <text x="340" y="378" text-anchor="middle" fill="#86efac" font-family="Segoe UI, system-ui, sans-serif" font-size="12" font-weight="400">phân bố đều theo thời gian</text>
+</svg>

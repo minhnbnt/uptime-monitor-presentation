@@ -17,6 +17,7 @@ export const cdc = [
         'Debezium CDC từ Postgres WAL của server-service → Redis Stream (uptime.public.servers)',
         'ontime-service chạy OwnershipConsumer duy trì table server_owners nội bộ',
         'CountByStatus dùng SQL JOIN cục bộ, không phụ thuộc server-service tại runtime',
+        'Stream thứ 2 uptime.public.endpoints → ping-service cập nhật endpoint cache (idempotent)',
         'Eventually consistent — loại bỏ synchronous call ở đường đọc aggregate/count',
       ],
     },
