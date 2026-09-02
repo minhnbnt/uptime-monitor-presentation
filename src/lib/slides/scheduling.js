@@ -121,6 +121,13 @@ export const scheduling = [
     },
   },
   {
+    id: 'zset-visual',
+    type: 'erd',
+    title: 'Cơ chế điều độ Redis ZSET (minh họa)',
+    caption: 'Task theo score (thời điểm chạy). Lua claim lấy các task ≤ now (+lock 10s), peek 1 next task, còn lại không lấy.',
+    src: 'assets/zset_scheduler.svg',
+  },
+  {
     id: 'scheduling-compare',
     type: 'scheduling',
     title: 'Temporal vs Redis ZSET',
@@ -181,13 +188,6 @@ export const scheduling = [
        end
 
       Note over WN: tương tự shard N-1 (N mặc định 1)`,
-  },
-  {
-    id: 'zset-visual',
-    type: 'erd',
-    title: 'Cơ chế điều độ Redis ZSET (minh họa)',
-    caption: 'Task theo score (thời điểm chạy). Lua claim lấy các task ≤ now (+lock 10s), peek 1 next task, còn lại không lấy.',
-    src: 'assets/zset_scheduler.svg',
   },
   {
     id: 'offset-hash-cpu',

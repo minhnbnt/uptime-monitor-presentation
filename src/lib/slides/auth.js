@@ -49,4 +49,27 @@ export const auth = [
       SRV->>SRV: authclient.GetUserID(ctx) → user_id (uint)
       SRV-->>User: 200 OK (user_id từ header)`,
   },
+  {
+    id: 'refresh-token',
+    type: 'diagram',
+    title: 'Refresh Token — luồng xoay vòng JWT',
+    diagram: `sequenceDiagram
+    actor User as Nguoi dung
+    participant AUTH as auth-service
+    participant DB as Postgres
+
+    User->>AUTH: POST /auth/refresh
+    AUTH->>AUTH: Parse JWT, verify signature
+    AUTH->>DB: SELECT session WHERE jti = ?
+    DB-->>AUTH: session, counter = N
+
+    alt Counter mismatch - replay attack
+      AUTH-->>User: 401 INVALID_REFRESH_TOKEN
+    else Counter hop le
+      AUTH->>DB: UPDATE counter = N+1 (CAS)
+      DB-->>AUTH: RowsAffected = 1
+      AUTH->>AUTH: Generate new token pair
+      AUTH-->>User: access_token and refresh_token
+    end`,
+  },
 ]
