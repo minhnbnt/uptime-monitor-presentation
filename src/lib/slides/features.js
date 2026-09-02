@@ -101,7 +101,7 @@ export const features = [
     id: 'ss-search',
     type: 'screenshot',
     title: 'Tìm kiếm Server',
-    caption: 'Full-text search với BM25 (ParadeDB), sort theo Name/Created Date/Score',
+    caption: 'Prefix search, sort theo Name/Created Date',
     src: 'assets/screenshots/search.png',
   },
   {
@@ -112,12 +112,12 @@ export const features = [
       autonumber
       actor User
       participant SRV as server-service
-      participant PDB as ParadeDB (pg_search)
+      participant DB as Postgres (server DB)
       participant ONT as ontime-service
 
-      User->>SRV: GET /api/v1/servers/search?q=&sort_by=score (JWT)
-      SRV->>PDB: BM25 query (name @@@ ?, LIMIT/OFFSET)
-      PDB-->>SRV: rows + total
+      User->>SRV: GET /api/v1/servers/search?q=&sort_by= (JWT)
+      SRV->>DB: SELECT servers WHERE name LIKE 'q%' LIMIT/OFFSET
+      DB-->>SRV: rows + total
       SRV->>ONT: gRPC GetCurrentStatuses
       ONT-->>SRV: status per server
       SRV-->>User: ServerListResponse (paginated)`,
@@ -226,12 +226,11 @@ export const features = [
       ],
     },
     right: {
-      title: 'Full-text Search (ParadeDB)',
+      title: 'Prefix Search',
       items: [
-        'BM25 search trên cột name',
+        'Tìm kiếm server theo tên (LIKE prefix)',
         'Đếm total trước, early return nếu 0',
-        'Sắp xếp theo relevance score',
-        'ParadeDB = PostgreSQL + pg_search',
+        'Sắp xếp theo Name hoặc Created Date',
       ],
     },
   },

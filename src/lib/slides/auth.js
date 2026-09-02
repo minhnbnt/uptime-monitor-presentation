@@ -49,30 +49,4 @@ export const auth = [
       SRV->>SRV: authclient.GetUserID(ctx) → user_id (uint)
       SRV-->>User: 200 OK (user_id từ header)`,
   },
-  {
-    id: 'design-search',
-    type: 'scheduling',
-    title: 'ParadeDB vs Elasticsearch',
-    subtitle: 'Tại sao chọn ParadeDB?',
-    highlight: 'right',
-    leftIcon: 'E',
-    left: {
-      title: 'Elasticsearch (thông thường)',
-      items: [
-        'Hạ tầng độc lập: phải vận hành, backup, đồng bộ index riêng với database chính',
-        'Query DSL (JSON) riêng, khác hẳn SQL quen thuộc',
-      ],
-    },
-    rightIcon: 'P',
-    right: {
-      title: 'ParadeDB (pg_search) — dự án chọn',
-      items: [
-        'Extension pg_search chạy ngay trong Postgres của server-service, chỉ mục BM25',
-        'Index nằm cùng transaction với dữ liệu gốc, không độ trễ đồng bộ, không thêm hạ tầng',
-        'SQL/GORM quen thuộc, không cần học Query DSL hay client riêng',
-        'Mã nguồn mở (AGPLv3), không lệ thuộc license thương mại',
-      ],
-    },
-    note: 'Đánh đổi: chỉ mục BM25 không ghi theo WAL chuẩn — có thể hỏng/lệch khi Postgres crash đột ngột, cần rebuild lại. Dữ liệu gốc vẫn được WAL bảo vệ. Đổi lấy: bớt hẳn một hạ tầng search + pipeline đồng bộ.',
-  },
 ]

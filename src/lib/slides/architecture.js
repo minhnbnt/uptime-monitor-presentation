@@ -11,7 +11,7 @@ export const architecture = [
     title: 'Tech Stack',
     items: [
       { icon: 'Go', name: 'Go 1.26', desc: '5 microservices + auth-service, mỗi service một Go module riêng' },
-      { icon: 'PG', name: 'ParadeDB', desc: 'PostgreSQL + pg_search (BM25 full-text), database riêng cho server/analytics + auth' },
+      { icon: 'PG', name: 'PostgreSQL', desc: 'Database chính cho server/analytics + auth' },
       { icon: 'Re', name: 'Valkey (Redis)', desc: 'ZSET scheduler + cache + CDC stream transport' },
       { icon: 'Te', name: 'Temporal', desc: 'Workflow engine (SendReport digest, chỉ notification-service dùng)' },
       { icon: 'Au', name: 'auth-service', desc: 'Auth tập trung tự viết: signup/login/refresh, JWT HS256, user_id = uint; Traefik forward-auth inject X-User-ID' },
@@ -37,7 +37,7 @@ export const architecture = [
     title: 'Hạ tầng dùng chung',
     items: [
       { icon: '🌐', name: 'Traefik', desc: 'Reverse proxy + API Gateway: route theo PathPrefix, forward-auth (/auth/verify) inject X-User-ID, CORS' },
-      { icon: '🐘', name: 'PostgreSQL (ParadeDB)', desc: 'wal_level=logical, BM25 full-text search, database riêng (server/analytics) + auth' },
+      { icon: '🐘', name: 'PostgreSQL', desc: 'Database chính, wal_level=logical' },
       { icon: '🔄', name: 'PgBouncer', desc: 'Connection pooling transaction mode cho tất cả service' },
       { icon: '⚡', name: 'Valkey (Redis)', desc: 'appendonly=yes. ZSET scheduler + cache + CDC stream transport' },
       { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream (uptime.public.servers, uptime.public.endpoints): ping-service (scheduler + endpoint cache) + ontime-service (ownership)' },
