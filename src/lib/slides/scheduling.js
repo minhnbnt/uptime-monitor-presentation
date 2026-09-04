@@ -53,23 +53,32 @@ export const scheduling = [
   {
     id: 'ontime-calc',
     type: 'two-column',
-    title: 'Tính ontime hàng ngày',
+    title: 'Tính uptime — BatchGetUptime (SQL)',
     left: {
-      title: 'Tìm biên',
+      title: 'Pipeline SQL',
       items: [
-        'Điểm đầu = max(start, first_event_time)',
-        'Điểm cuối = min(end, now)',
-        'Lấy event trước điểm đầu và điểm cuối để xác định trạng thái',
+        'windows: parse input JSON (endpoint_id, from, to)',
+        'known_events: filter ON/OFF/UNKNOWN từ server_events',
+        'timeline: carry-in (event trước window_start) + events trong window',
+        'LEAD(time) → tạo half-open intervals [start, end)',
       ],
     },
     right: {
-      title: 'Tính tỉ lệ',
+      title: 'Clamp & Tổng hợp',
       items: [
-        'Duyệt event, tìm các khoảng ON → OFF',
-        'Tổng thời gian ON / tổng thời gian',
-        'Dùng cache Valkey (TTL 10s hôm nay / 1h lịch sử)',
+        'Clamp mỗi segment về window: GREATEST(time, window_start), LEAST(next, window_end)',
+        'SUM(EXTRACT(EPOCH)) WHERE status = ON → online_seconds',
+        'SUM(EXTRACT(EPOCH)) WHERE status = UNKNOWN → unknown_seconds',
+        'observed_from = có carry-in thì window_start, không thì MIN(segment_start)',
       ],
     },
+  },
+  {
+    id: 'ontime-lead',
+    type: 'erd',
+    title: 'LEAD(time) — biến events thành segments',
+    caption: 'Mỗi row có time → LEAD lấy time của row tiếp theo → tạo khoảng [start, end). Clamp để segment không vượt cửa sổ.',
+    src: 'assets/lead_events_to_segments.svg',
   },
   {
     id: 'ontime-lowerbound',
