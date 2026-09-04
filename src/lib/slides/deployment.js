@@ -3,7 +3,7 @@ export const deployment = [
     id: 'deployment',
     type: 'section',
     title: 'Triển khai',
-    number: '05',
+    number: '04',
   },
   {
     id: 'deployment-detail',

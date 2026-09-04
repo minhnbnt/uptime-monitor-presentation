@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" viewBox="0 0 680 390" role="img">
+  <title>Vì sao replicate quan hệ user–server sang ontime-service</title>
+  <desc>Request đếm on/off đến ontime-service nhưng quan hệ user-server nằm ở server-service. Fetch ids thì nặng, đếm thẳng thì sai quyền. Giải pháp: CDC replicate chỉ đọc rồi JOIN cục bộ.</desc>
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+    <marker id="arr-green" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#34d399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+
+  <!-- dark background so the figure is dark by default -->
+  <rect x="0" y="0" width="680" height="390" rx="12" fill="#0b1120"/>
+
+  <g font-family="Segoe UI, system-ui, sans-serif">
+    <!-- Client -->
+    <rect x="24" y="14" width="90" height="36" rx="8" fill="#1e293b" stroke="#64748b" stroke-width="1.5"/>
+    <text x="69" y="37" text-anchor="middle" fill="#e2e8f0" font-size="14" font-weight="600">Client</text>
+
+    <!-- request arrow to ontime-service -->
+    <line x1="114" y1="32" x2="510" y2="32" stroke="#cbd5e1" stroke-width="1.5"/>
+    <line x1="510" y1="32" x2="510" y2="70" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#arr)"/>
+    <text x="312" y="22" text-anchor="middle" fill="#e2e8f0" font-size="13" font-weight="600">GET /servers/count (user_id)</text>
+
+    <!-- server-service box -->
+    <rect x="24" y="70" width="290" height="128" rx="10" fill="#16213a" stroke="#334155" stroke-width="1.5"/>
+    <text x="40" y="96" fill="#7dd3fc" font-size="15" font-weight="700">server-service</text>
+    <rect x="36" y="106" width="266" height="60" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="48" y="129" fill="#cbd5e1" font-size="13" font-weight="600">server DB</text>
+    <text x="48" y="150" fill="#86efac" font-size="12.5">giữ quan hệ user–server ✓</text>
+    <text x="40" y="188" fill="#64748b" font-size="12">created_by_id: server của ai</text>
+
+    <!-- ontime-service box -->
+    <rect x="366" y="70" width="290" height="128" rx="10" fill="#16213a" stroke="#334155" stroke-width="1.5"/>
+    <text x="382" y="96" fill="#fbbf24" font-size="15" font-weight="700">ontime-service</text>
+    <rect x="378" y="106" width="266" height="38" rx="8" fill="#0f172a" stroke="#475569" stroke-width="1"/>
+    <text x="390" y="130" fill="#cbd5e1" font-size="13" font-weight="600">server_events ✓</text>
+    <rect x="378" y="150" width="266" height="36" rx="8" fill="#1e293b" stroke="#f87171" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <text x="390" y="173" fill="#fca5a5" font-size="12.5" font-weight="600">✗ thiếu ownership</text>
+
+    <!-- two bad options, kept short -->
+    <text x="340" y="222" text-anchor="middle" fill="#fca5a5" font-size="13">✗ fetch hết ids → nặng</text>
+    <text x="340" y="243" text-anchor="middle" fill="#fca5a5" font-size="13">✗ đếm thẳng → sai quyền</text>
+
+    <!-- divider, split so the CDC line never crosses it -->
+    <line x1="40" y1="258" x2="52" y2="258" stroke="#334155" stroke-width="1"/>
+    <line x1="68" y1="258" x2="640" y2="258" stroke="#334155" stroke-width="1"/>
+
+    <!-- solution: CDC line runs down the empty left lane, then right -->
+    <line x1="60" y1="198" x2="60" y2="330" stroke="#34d399" stroke-width="2"/>
+    <line x1="60" y1="330" x2="368" y2="330" stroke="#34d399" stroke-width="2" marker-end="url(#arr-green)"/>
+    <text x="210" y="320" text-anchor="middle" fill="#86efac" font-size="12.5" font-weight="600">CDC (chỉ đọc)</text>
+
+    <!-- server_owners replica box -->
+    <rect x="368" y="290" width="276" height="80" rx="8" fill="#052e16" stroke="#34d399" stroke-width="1.5"/>
+    <text x="380" y="313" fill="#86efac" font-size="13" font-weight="700">server_owners ✓ chỉ đọc</text>
+    <text x="380" y="335" fill="#cbd5e1" font-size="12.5">CountByStatus: JOIN 1 query</text>
+    <text x="380" y="355" fill="#cbd5e1" font-size="12.5">là xong ✓</text>
+  </g>
+</svg>

@@ -1,8 +1,8 @@
-export const features = [
+export const featuresHead = [
   {
     id: 'features',
     type: 'section',
-    title: 'Tính năng',
+    title: 'Tính năng & Quyết định thiết kế',
     number: '03',
   },
   {
@@ -10,11 +10,13 @@ export const features = [
     type: 'two-column',
     title: 'Chức năng chính',
     left: {
-      title: 'CRUD Server',
+      title: 'CRUD & Tìm kiếm Server',
       items: [
         'Tạo, xem, sửa, xóa server + endpoint (URL, method, interval, timeout, expected_code)',
         'Test-server: ping HTTP/DNS thử ngay trước khi lưu',
-        'Import hàng loạt từ CSV/Excel, kết quả theo từng dòng (row-level)',
+        'Dữ liệu phân tách theo user',
+        'Prefix search theo tên, sort theo Name/Created Date',
+        'Import hàng loạt CSV/Excel (row-level), export sao lưu cấu hình',
       ],
     },
     right: {
@@ -23,10 +25,12 @@ export const features = [
         'Định kỳ: cấu hình lịch → Temporal trigger workflow → tổng hợp số liệu → gửi mail',
         'Chủ động (on-demand): SendReport → Temporal trigger ngay lập tức',
         'Cả hai dùng chung workflow gRPC auth/server/ontime lấy thông tin + số liệu',
-        'Export server ra file phục vụ sao lưu / di chuyển cấu hình',
       ],
     },
   },
+]
+
+export const featCreate = [
   {
     id: 'ss-create',
     type: 'screenshot',
@@ -45,20 +49,18 @@ export const features = [
       participant DB as Postgres (server DB)
       participant DEB as Debezium
       participant Redis as Redis Stream
-      participant PING as ping-service
-      participant ONT as ontime-service
 
       User->>SRV: POST /api/v1/servers (JWT, endpoint URL/HTTP)
       SRV->>SRV: Traefik forward-auth đã inject X-User-ID
       SRV->>DB: INSERT servers + endpoints (txn)
       SRV-->>User: ServerObject (server + check config)
       DB->>DEB: logical WAL
-      DEB->>Redis: uptime.public.servers + uptime.public.endpoints
-      Redis-->>PING: ServerEventHandler + EndpointEventHandler
-      PING->>Redis: ZADD scheduler:queue:<shard>
-      Redis-->>ONT: OwnershipConsumer
-      ONT->>ONT: upsert server_owners (analytics)`,
+      DEB->>Redis: CDC event (server + endpoint)
+      Note over Redis: ping-service & ontime-service consume (chi tiết ở slide sau)`,
   },
+]
+
+export const featDetail = [
   {
     id: 'ss-detail',
     type: 'screenshot',
@@ -82,21 +84,22 @@ export const features = [
       User->>SRV: GET /api/v1/servers/{id} (JWT)
       SRV->>DB: SELECT servers WHERE id
       SRV->>ONT: gRPC GetCurrentStatuses
-      ONT->>ADB: latest event per server (DISTINCT ON)
+      ONT->>ADB: latest event per server
       ADB-->>ONT: ON/OFF status
       ONT-->>SRV: monitor_status
       SRV-->>User: server metadata + status
       User->>ONT: GET /api/v1/servers/ontime/{id} (JWT)
-      ONT->>ADB: SELECT server_owners WHERE user_id AND server_id IN (ids)
-      ONT->>Redis: MGET ontime:{id}:{date}:stats (30 ngày) — chỉ server user sở hữu
+      ONT->>Redis: cached ontime 30 ngày — chỉ server user sở hữu
       alt cache miss
-        ONT->>ADB: query server_events (lowerbound + day events)
+        ONT->>ADB: query server_events
         ADB-->>ONT: events
-        Note over ONT: CalculateDayOntime
-        ONT->>Redis: MSet (TTL: 1h / today 10s)
+        Note over ONT: tính uptime (chi tiết ở slide sau)
       end
-      ONT-->>User: ontime_stats (30 ngày, chỉ các server thuộc user)`,
+      ONT-->>User: ontime_stats (30 ngày)`,
   },
+]
+
+export const featSearch = [
   {
     id: 'ss-search',
     type: 'screenshot',
@@ -122,6 +125,9 @@ export const features = [
       ONT-->>SRV: status per server
       SRV-->>User: ServerListResponse (paginated)`,
   },
+]
+
+export const featImportExport = [
   {
     id: 'ss-import-export',
     type: 'screenshot',
@@ -152,7 +158,7 @@ export const features = [
       end
       IMP-->>User: success_count / failed[]
       DB->>DEB: logical WAL
-      DEB->>Redis: uptime.public.servers (bulk)
+      DEB->>Redis: CDC event (bulk)
 
       Note over User,Redis: Export — GET /api/v1/servers/export
       User->>IMP: GET /export?q=&sort_by= (JWT)
@@ -161,6 +167,9 @@ export const features = [
       IMP->>IMP: excelize generate xlsx
       IMP-->>User: servers.xlsx (attachment)`,
   },
+]
+
+export const featNotify = [
   {
     id: 'ss-notifications',
     type: 'screenshot',
@@ -211,27 +220,5 @@ export const features = [
       Note over NOT: buildReport + excelgen
       NOT->>SMTP: send email + report.xlsx
       SMTP-->>NOT: success`,
-  },
-  {
-    id: 'crud-search',
-    type: 'two-column',
-    title: 'Quản lý & Tìm kiếm Server',
-    left: {
-      title: 'CRUD Server (server-service)',
-      items: [
-        'Mỗi server định danh bằng endpoint (URL, method, interval)',
-        'Dữ liệu phân tách theo user',
-        'Cleanup scheduler + cache khi xoá',
-        'Handler → Service → Repository → DB',
-      ],
-    },
-    right: {
-      title: 'Prefix Search',
-      items: [
-        'Tìm kiếm server theo tên (LIKE prefix)',
-        'Đếm total trước, early return nếu 0',
-        'Sắp xếp theo Name hoặc Created Date',
-      ],
-    },
   },
 ]

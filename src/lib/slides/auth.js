@@ -1,10 +1,4 @@
-export const auth = [
-  {
-    id: 'design-decisions',
-    type: 'section',
-    title: 'Quyết định thiết kế',
-    number: '04',
-  },
+export const authBasic = [
   {
     id: 'auth-forward',
     type: 'two-column',
@@ -49,6 +43,9 @@ export const auth = [
       SRV->>SRV: authclient.GetUserID(ctx) → user_id (uint)
       SRV-->>User: 200 OK (user_id từ header)`,
   },
+]
+
+export const authDeep = [
   {
     id: 'refresh-token',
     type: 'diagram',

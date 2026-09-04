@@ -1,4 +1,4 @@
-export const cdc = [
+export const cdcDeep = [
   {
     id: 'cdc-idea',
     type: 'two-column',
@@ -14,13 +14,20 @@ export const cdc = [
     right: {
       title: 'Giải pháp',
       items: [
-        'Debezium CDC từ Postgres WAL của server-service → Redis Stream (uptime.public.servers)',
+        'Debezium CDC từ Postgres WAL của server-service → Redis Stream',
         'ontime-service chạy OwnershipConsumer duy trì table server_owners nội bộ',
         'CountByStatus dùng SQL JOIN cục bộ, không phụ thuộc server-service tại runtime',
-        'Stream thứ 2 uptime.public.endpoints → ping-service cập nhật endpoint cache (idempotent)',
+        'Stream endpoints → ping-service cập nhật endpoint cache (idempotent)',
         'Eventually consistent — loại bỏ synchronous call ở đường đọc aggregate/count',
       ],
     },
+  },
+  {
+    id: 'cdc-why',
+    type: 'erd',
+    title: 'Vì sao replicate ownership sang ontime-service',
+    caption: 'Request đếm on/off đến ontime-service nhưng quan hệ user–server nằm ở server-service: fetch ids thì nặng, đếm thẳng thì sai quyền — nên replicate chỉ đọc rồi JOIN cục bộ.',
+    src: 'assets/ownership_replication.svg',
   },
   {
     id: 'cdc-sequence',
@@ -32,7 +39,7 @@ export const cdc = [
       participant SRV as server-service
       participant PG as Postgres(server DB)
       participant DEB as Debezium
-      participant Stream as Redis Stream (uptime.public.servers)
+      participant Stream as Redis Stream
       participant ONT as ontime-service
       participant DB as analytics.server_owners
 
