@@ -14,7 +14,7 @@ export const architecture = [
   {
     id: 'service-list',
     type: 'card-grid',
-    title: '6 Services',
+    title: '6 Services (Go 1.27)',
     cards: [
       { icon: '🔐', title: 'auth-service', desc: 'Auth tập trung: đăng ký/đăng nhập email, cấp JWT HS256, forward-auth' },
       { icon: '🖥️', title: 'server-service', desc: 'CRUD server + endpoint (URL/HTTP), kiểm tra quyền sở hữu' },
@@ -27,14 +27,14 @@ export const architecture = [
   {
     id: 'infrastructure',
     type: 'tech-stack',
-    title: 'Tech Stack & Hạ tầng dùng chung',
+    title: 'Hạ tầng dùng chung',
     items: [
-      { icon: 'Go', name: 'Go 1.27', desc: '5 microservices + auth-service, mỗi service một Go module riêng' },
-      { icon: '🐘', name: 'PostgreSQL + PgBouncer', desc: 'DB chính server/analytics/auth, wal_level=logical; pooling transaction mode' },
-      { icon: '⚡', name: 'Valkey (Redis)', desc: 'appendonly=yes. ZSET scheduler + cache + CDC stream transport' },
-      { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream (uptime.public.servers, uptime.public.endpoints)' },
-      { icon: '⏱️', name: 'Temporal', desc: 'Workflow engine cho SendReport digest mail. Chỉ notification-service dùng' },
       { icon: '🌐', name: 'Traefik', desc: 'API Gateway: route theo PathPrefix, forward-auth (/auth/verify) inject X-User-ID, CORS' },
+      { icon: '🐘', name: 'PostgreSQL', desc: 'Database chính, wal_level=logical' },
+      { icon: '🔄', name: 'PgBouncer', desc: 'Connection pooling transaction mode cho tất cả service' },
+      { icon: '⚡', name: 'Valkey (Redis)', desc: 'appendonly=yes. ZSET scheduler + cache + CDC stream transport' },
+      { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream' },
+      { icon: '⏱️', name: 'Temporal', desc: 'Workflow engine cho SendReport digest mail. Chỉ notification-service dùng' },
     ],
   },
 ]
