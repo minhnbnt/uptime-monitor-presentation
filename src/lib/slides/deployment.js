@@ -13,7 +13,7 @@ export const deployment = [
       {
         icon: '📦',
         title: 'Container Multi-stage',
-        desc: 'golang:1.26-alpine → UPX compress → distroless nonroot',
+        desc: 'golang:1.27-alpine → UPX compress → distroless nonroot',
       },
       {
         icon: '☸️',

@@ -81,7 +81,7 @@
               {slides[current].subtitle}
             </p>
             <div class="flex items-center justify-center gap-3 mt-6">
-              <span class="badge">Go 1.26</span>
+              <span class="badge">Go 1.27</span>
               <span class="badge">PostgreSQL</span>
               <span class="badge">Redis</span>
               <span class="badge">Temporal</span>

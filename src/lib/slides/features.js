@@ -220,7 +220,7 @@ export const features = [
       title: 'CRUD Server (server-service)',
       items: [
         'Mỗi server định danh bằng endpoint (URL, method, interval)',
-        'Dữ liệu phân tách theo user (created_by_id UUID)',
+        'Dữ liệu phân tách theo user',
         'Cleanup scheduler + cache khi xoá',
         'Handler → Service → Repository → DB',
       ],

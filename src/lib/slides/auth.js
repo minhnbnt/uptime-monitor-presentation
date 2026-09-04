@@ -6,7 +6,7 @@ export const auth = [
     number: '04',
   },
   {
-    id: 'auth-oidc',
+    id: 'auth-forward',
     type: 'two-column',
     title: 'Xác thực tập trung qua auth-service + forward-auth',
     left: {

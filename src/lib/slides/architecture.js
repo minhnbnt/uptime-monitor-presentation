@@ -6,17 +6,10 @@ export const architecture = [
     number: '02',
   },
   {
-    id: 'tech-stack',
-    type: 'tech-stack',
-    title: 'Tech Stack',
-    items: [
-      { icon: 'Go', name: 'Go 1.26', desc: '5 microservices + auth-service, mỗi service một Go module riêng' },
-      { icon: 'PG', name: 'PostgreSQL', desc: 'Database chính cho server/analytics + auth' },
-      { icon: 'Re', name: 'Valkey (Redis)', desc: 'ZSET scheduler + cache + CDC stream transport' },
-      { icon: 'Te', name: 'Temporal', desc: 'Workflow engine (SendReport digest, chỉ notification-service dùng)' },
-      { icon: 'Au', name: 'auth-service', desc: 'Auth tập trung tự viết: signup/login/refresh, JWT HS256, user_id = uint; Traefik forward-auth inject X-User-ID' },
-      { icon: 'Tr', name: 'Traefik', desc: 'API Gateway: route theo PathPrefix + forward-auth (/auth/verify) + CORS' },
-    ],
+    id: 'architecture-total',
+    type: 'erd',
+    title: 'Kiến trúc tổng quan',
+    src: 'assets/uptime_monitor_architecture_simple.svg',
   },
   {
     id: 'service-list',
@@ -34,20 +27,14 @@ export const architecture = [
   {
     id: 'infrastructure',
     type: 'tech-stack',
-    title: 'Hạ tầng dùng chung',
+    title: 'Tech Stack & Hạ tầng dùng chung',
     items: [
-      { icon: '🌐', name: 'Traefik', desc: 'Reverse proxy + API Gateway: route theo PathPrefix, forward-auth (/auth/verify) inject X-User-ID, CORS' },
-      { icon: '🐘', name: 'PostgreSQL', desc: 'Database chính, wal_level=logical' },
-      { icon: '🔄', name: 'PgBouncer', desc: 'Connection pooling transaction mode cho tất cả service' },
+      { icon: 'Go', name: 'Go 1.27', desc: '5 microservices + auth-service, mỗi service một Go module riêng' },
+      { icon: '🐘', name: 'PostgreSQL + PgBouncer', desc: 'DB chính server/analytics/auth, wal_level=logical; pooling transaction mode' },
       { icon: '⚡', name: 'Valkey (Redis)', desc: 'appendonly=yes. ZSET scheduler + cache + CDC stream transport' },
-      { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream (uptime.public.servers, uptime.public.endpoints): ping-service (scheduler + endpoint cache) + ontime-service (ownership)' },
+      { icon: '🔀', name: 'Debezium', desc: 'CDC Postgres WAL → Redis Stream (uptime.public.servers, uptime.public.endpoints)' },
       { icon: '⏱️', name: 'Temporal', desc: 'Workflow engine cho SendReport digest mail. Chỉ notification-service dùng' },
+      { icon: '🌐', name: 'Traefik', desc: 'API Gateway: route theo PathPrefix, forward-auth (/auth/verify) inject X-User-ID, CORS' },
     ],
-  },
-  {
-    id: 'architecture-total',
-    type: 'erd',
-    title: 'Kiến trúc tổng quan',
-    src: 'assets/uptime_monitor_architecture_simple.svg',
   },
 ]
